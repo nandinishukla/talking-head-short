@@ -13,7 +13,7 @@ The pipeline takes one raw recording (plus an optional clean-audio file) to `edi
 - **Motion library:** `references/motion-library.md` holds the user's curated motion references, the house look the graphics follow.
 - **Examples:** `references/examples/` holds the graphics from the first short (r1–r9 plus cta). `references/example-report.md` is a finished report.
 
-Work autonomously apart from one deliberate stop: the storyboard approval in step 7. The brief tells the user not to be asked anything: make each judgement call (take choice, layout, factual disagreement, unreachable UI), keep going, and log it for the report. The storyboard approval is the only point where you wait for the user. Only stop if the input files are missing or unreadable.
+Ask the editor the **style intake questions** first (step 0b), then work autonomously apart from one deliberate stop: the storyboard approval in step 7. Between those two points, don't ask the user anything: make each judgement call (take choice, layout, factual disagreement, unreachable UI), keep going, and log it for the report. The storyboard approval is the only point where you wait for the user. Only stop if the input files are missing or unreadable.
 
 ## Layout of a project
 
@@ -39,6 +39,16 @@ All scripts run **from `edit/`** with `export PATH="$PWD/tools/bin:$PATH"` and `
 Decode once into an oriented intermediate. Don't re-decode 4K for every step:
 `ffmpeg -i RAW.MP4 -an -vf scale=1080:-2 -c:v libx264 -crf 13 -g 15 work/cam1080.mp4`
 Use `scale=-2:1080` for a landscape source. Run long commands in the background: about 6 min per 90 s of 4K on an 8 GB Mac.
+
+### 0b. Style intake (ask once, before any work)
+Ask the person editing the video, in ONE round of questions (use the question tool when you have it), for the choices only they can make. Skip anything they already gave, and record the answers in `project.json` → `"intake"`:
+1. **Captions:** the everyday small style, `"small_style": "pill"` (calm, general videos) or `"mono"` (typewriter, tech/AI/dev videos); plus whether to use **hero** moments (hook and key lines with only them on screen).
+2. **Accent colour:** from the topic (the main product's brand colour; you research it), matched to their clothes, or a hex they name → `"accent"`.
+3. **CTA:** `"cta_style": "box"` or `"pill"`, the comment keyword, and the link chip text for the pill (e.g. "Free on GitHub · owner/repo").
+4. **Music:** `"music": {"mode": "synth" | "file" | "none"}` (+ the file path).
+5. **Cover title:** theirs, or written from the hook.
+
+Offer sensible defaults in the options (for example the topic's brand colour; pill + hero for general videos, mono + hero for tech ones; the other CTA style from their last video), so answering takes seconds. If nobody can answer (an unattended run), use those defaults and say so in the report.
 
 ### 1. Sync and transcribe
 1. `$PY $S/analyze_audio.py <camera> [clean_audio]` cross-correlates at 16 kHz and reports the offset and peak ratio. It writes the voice source on the camera timeline, the 10 ms RMS envelope, the clipped-sample count and the noise floor. With no clean file, it uses the camera track and you must say so in the report.

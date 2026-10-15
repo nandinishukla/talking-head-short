@@ -4,8 +4,14 @@ This is the full original brief the pipeline was built against. SKILL.md summari
 
 You're editing my raw talking-head recording into a finished, ready-to-post 9:16 short (Instagram Reel, TikTok, YouTube Short). Do all of it yourself, end to end, in code: ffmpeg, Python, Node and HyperFrames (npx --yes hyperframes). No video editor app. Every sound effect and the music are synthesized by you in code; there are no audio files to use. You may install what you need locally inside this project (npm packages in the project folder, pip into a local venv), without asking. Never install system-wide software.
 
-WORK FULLY AUTONOMOUSLY
-- Don't ask me anything after this message. Run every step start to finish and finish with final.mp4 exported.
+ASK ME THE STYLE QUESTIONS FIRST, THEN WORK AUTONOMOUSLY
+- Before any work, ask me once, in a single round of questions, for the style choices only I can make (skip any I've already answered in this message):
+  - caption style: the everyday small captions (PILL, or MONO typewriter), and whether to use HERO moments;
+  - accent colour: picked from the topic (the main product's brand colour), matched to my clothes, or a colour I name;
+  - CTA style (comment box or comment pill), the CTA keyword, and the link chip text (e.g. "Free on GitHub · owner/repo");
+  - music: a synthesized bed, my own track (give the file), or none;
+  - cover title: mine, or you write it from the hook.
+- After that, don't ask me anything else until the storyboard: run every step and finish with final.mp4 exported.
 - Every judgement call (which take, layout choices, a fact that disagrees with its sources, a product UI you can't capture) is yours: make the best call, keep going, and log it in the report.
 - If something fails, try another way (a different tool, method or fallback) rather than stopping. A missing tool is not a reason to stop: install it locally or use an alternative.
 - If a real product UI is behind a login, rebuild it from public screenshots or docs and note it in the report.
