@@ -3,7 +3,12 @@
   python assemble.py 0,240,1300    -> only write those frames as PNGs to work/qa/ (fast checks; stops at the max)
 Inputs: work/camtrack.mp4 (+_map.json), work/camwide.mp4 for landscape sources, work/gfx/final/<run>_60.mp4 per
 graphic run, work/matte/<RUN>.mov/.json per split run, work/gfx/final/cta.mov, work/cover.png, work/captions.json
-(+ work/captions/ layers from captions.py), final_master.wav. Optional project.json "split": {"scale": 0.72, "y": 538} for PORTRAIT sources."""
+(+ work/captions/ layers from captions.py), final_master.wav.
+PORTRAIT sources, optional project.json "split": {"mode": "fit" | "cover", "scale": .., "y": ..}
+  fit   (default) footage at 0.72 (778x1382), and the camera card is exactly as wide as the footage (bleeds off
+        the bottom only), so no part of the card ever needs filling: no blurred side bands
+  cover footage at full width (1080x1920) behind a card that bleeds off left/right/bottom like the 16:9 layout;
+        the head is bigger and reaches ~y 760, so split graphics must keep their content above ~y 720"""
 import json, subprocess, sys, os, numpy as np, cv2
 SK = os.path.dirname(os.path.abspath(__file__)); FPS = 60
 P = json.load(open('work/plan.json')); END = P['END']; N = int(round(END * FPS)); runs = P['runs']
@@ -24,11 +29,16 @@ def reader(path, w, h, fmt='rgb24', vf=None):
 
 # ---------- split geometry ----------
 CX, CY, CW, CH, CR = -65, 1200, 1210, 864, 200            # camera card, squircle radius 200, bleeds L/R/bottom
-if WIDE:   # 16:9 source: footage 1890x1063 at (-405, 1008), as specified
+SPL = CFG.get('split', {}); MODE = 'wide' if WIDE else SPL.get('mode', 'fit')
+if MODE == 'wide':    # 16:9 source: footage 1890x1063 at (-405, 1008), as specified
     SW, SH, SX, SY = 1890, 1063, -405, 1008; FEED = (1890, 1063)
-else:      # portrait source: derived so the head clears the graphic zone (content ends y 900) and the card is covered
-    sc = CFG.get('split', {}).get('scale', 0.72); SW, SH = round(1080 * sc), round(1920 * sc)
-    SX = (1080 - SW) // 2; SY = CFG.get('split', {}).get('y', 1920 - SH); FEED = (1080, 1920)
+elif MODE == 'cover': # portrait at full width: covers the bleeding card; head chin lands near the card edge
+    sc = SPL.get('scale', 1.0); SW, SH = round(1080 * sc), round(1920 * sc)
+    SX = (1080 - SW) // 2; SY = SPL.get('y', 240); FEED = (1080, 1920)
+else:                 # portrait 'fit': head clears the graphic zone; the card shrinks to the footage width
+    sc = SPL.get('scale', 0.72); SW, SH = round(1080 * sc), round(1920 * sc)
+    SX = (1080 - SW) // 2; SY = SPL.get('y', 1920 - SH); FEED = (1080, 1920)
+    CX, CW = SX, SW                                          # card = footage width, so it is always fully covered
 yy, xx = np.mgrid[0:1920, 0:1080].astype(np.float32)
 def squircle():
     R = CR * 1.25; n = 5.0; lx, rx, ty, by = CX, CX + CW, CY, CY + CH
@@ -45,8 +55,10 @@ for oy, blur, a in ((60, 120, .16), (24, 48, .10), (4, 10, .06)):
     sh = 1 - (1 - sh) * (1 - a * cv2.GaussianBlur(s_, (0, 0), blur / 2))
 SHA = (sh * (1 - M[..., 0]))[..., None]; SHC = np.array([24, 24, 32], np.float32)
 RAMP = np.clip((CY + 40 - yy) / 40.0, 0, 1)[..., None]      # head shows above the card edge, feathered 40 px into it
-INSIDE = ((xx >= SX) & (xx < SX + SW) & (yy >= SY) & (yy < SY + SH))
-FX = (np.clip(np.minimum(xx - SX, SX + SW - xx) / 70.0, 0, 1) * INSIDE)[..., None]
+# the card must be fully covered by real footage: never fill it with blur or stretched pixels
+_vis = (M[..., 0] > 0.01) & (yy < 1920)
+_cov = (xx >= SX) & (xx < SX + SW) & (yy >= SY) & (yy < SY + SH)
+assert not (_vis & ~_cov).any(), 'split card is not fully covered by the footage: adjust "split" scale/y/mode'
 
 def place(img, interp=cv2.INTER_AREA):
     """scale img to (SW,SH) and paste at (SX,SY) on a 1080x1920 canvas (clipped)"""
@@ -58,14 +70,8 @@ def place(img, interp=cv2.INTER_AREA):
 def split_frame(G, F, A):
     """G graphic, F split footage frame, A matte of the SAME source frame (any size)"""
     G = G.astype(np.float32); S = place(F)
-    if WIDE: card = S
-    else:    # portrait: fill the card's side strips with a blurred, darkened, enlarged copy of the same frame
-        big = cv2.GaussianBlur(cv2.resize(F, (round(1080 * 1.15), round(1920 * 1.15)), interpolation=cv2.INTER_AREA), (0, 0), 30).astype(np.float32) * 0.82
-        B = np.zeros_like(G); oy = SY - (big.shape[0] - SH) // 2; ox = (big.shape[1] - 1080) // 2
-        y0, y1 = max(0, oy), min(1920, oy + big.shape[0]); B[y0:y1] = big[y0 - oy:y1 - oy, ox:ox + 1080]
-        card = B * (1 - FX) + S * FX
     out = G * (1 - SHA) + SHC * SHA
-    out = out * (1 - M) + card * M
+    out = out * (1 - M) + S * M                              # the card shows only real footage
     Ah = place(cv2.resize(A, FEED, interpolation=cv2.INTER_LINEAR).astype(np.float32) / 255.0, cv2.INTER_LINEAR)[..., None] * RAMP
     out = out * (1 - Ah) + S * Ah
     return np.clip(out, 0, 255).astype(np.uint8)

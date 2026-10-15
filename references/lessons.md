@@ -17,7 +17,8 @@ These are the things that actually went wrong or cost time on the first short. E
 - Put run boundaries on picture cuts where you can: a layout change then lands on a real edit. The hook→first-point boundary may sit inside one continuous take; that's fine.
 
 ## Portrait split layout
-- The brief's split numbers (1890x1063 at -405, 1008) assume 16:9. For a portrait source at scale 1.0 the head is about 460 px tall and covers the graphic zone. Scale about 0.72 (778x1382, centred, bottom on the canvas bottom) puts the head top near y 912 and the chin at the card edge. The card's side strips then need a blurred, darkened, enlarged copy of the same frame, feathered 70 px.
+- The brief's split numbers (1890x1063 at -405, 1008) assume 16:9. For a portrait source at scale 1.0 the head is about 460 px tall and covers the graphic zone. Scale about 0.72 (778x1382, centred, bottom on the canvas bottom) puts the head top near y 912 and the chin at the card edge.
+- **Don't fill the leftover side strips with a blurred copy of the frame.** The first short did, and the user called out the blurry bands at the sides. Now the card is exactly as wide as the footage (`"mode": "fit"`, the default), or the footage is full width (`"mode": "cover"`) with the split graphics kept above about y 720. `assemble.py` asserts that the card is fully covered by real footage.
 - In that geometry the brief's split caption gap (941-1114) **is the face**. Put split captions on the card over the torso (about y 1660). Also check the outro: at y 1171 captions sat on the chin, so about y 1262 (bottom of the outro zone) cleared it. Always look at a real frame with captions burned in.
 
 ## Mattes

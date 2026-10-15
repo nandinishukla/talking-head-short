@@ -126,7 +126,7 @@ How the engine works and the rules that matter:
 
 ### 9. Camera track and mattes
 1. `$PY $S/camtrack.py work/cam1080.mp4` writes the frame-exact 60 fps cut (cover-fit full cam, plus `camwide.mp4` for 16:9 split footage) and prints a check that every join shows the new take from its first frame.
-2. `$PY $S/matte.py` handles background removal per split run, unique source frames only, keyed by source frame. The head and card therefore come from the same frame even after retiming. For a portrait source the split geometry is derived (scale about 0.72, head clear of y 900); set `"split": {"scale", "y"}` if the framing differs, and check that the head clears the card.
+2. `$PY $S/matte.py` handles background removal per split run, unique source frames only, keyed by source frame. The head and card therefore come from the same frame even after retiming. For a portrait source the split geometry is derived. The default `"split": {"mode": "fit"}` puts the footage at 0.72 scale with the head clear of y 900, and makes the camera card exactly as wide as the footage (it bleeds off the bottom only), so the card is always real footage edge to edge. `"mode": "cover"` puts full-width footage behind a card that bleeds off both sides like the 16:9 layout. The head is then bigger (top near y 760), so split graphics must keep their content above about y 720. `assemble.py` refuses to render if any part of the card isn't covered by footage. Never fill the card with blurred or stretched copies. Tune `"scale"`/`"y"` if the framing differs, and check that the head clears the graphics.
 
 ### 10. Audio
 1. `$PY $S/audio.py` writes:
