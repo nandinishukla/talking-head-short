@@ -28,5 +28,17 @@ Add the motion references you like to `references/motion-library.md`. Then hand 
 ## Requirements
 macOS or Linux with Node 18+, Python 3.9+ and about 5 GB free disk. Everything else installs locally into the project via `scripts/setup.sh`.
 
+## Credits
+The motion references in `references/motion-prompts.md` come from [prompt-motion.com](https://prompt-motion.com/) (curated by @p4nthera_). Prompts by
+[@wozu-co](https://prompt-motion.com/customize/wozu-co-242285),
+[@elliot-garreffa](https://prompt-motion.com/customize/elliot-garreffa-f334bc),
+[@bizibeast](https://prompt-motion.com/customize/bizibeast-10f264),
+[@adamdesgns](https://prompt-motion.com/customize/adamdesgns-478d6d),
+[@devius-maximus](https://prompt-motion.com/customize/devius-maximus-beab45),
+[@fractadev](https://prompt-motion.com/customize/fractadev-149adc),
+[@miskinho](https://prompt-motion.com/customize/miskinho-443898) and
+[@gautam-mer1](https://prompt-motion.com/customize/gautam-mer1-2ae354).
+The prompts belong to their creators.
+
 ## Licences
 Code: MIT. Fonts in `assets/fonts/` (Poppins, Pacifico, Archivo Black, EB Garamond, IBM Plex Mono, Inter) are under the SIL Open Font License 1.1.
