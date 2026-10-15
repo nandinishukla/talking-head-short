@@ -203,15 +203,28 @@ for k, c in enumerate(chunks):
 json.dump(items, open('work/captions.json', 'w'), indent=1)
 print(len(items), 'caption chunks:', ', '.join(f"{sum(i['style'] == s_ for i in items)} {s_}" for s_ in ('hero', 'pill', 'mono')), '-> work/captions.json')
 
-# cover: Poppins Bold 110, black on a white rounded box centred around y 262-603, frame 0 only
+# cover: frame 0 only. A white rounded box (radius 30, soft shadow) centred from y 262, ~50 px side padding.
+# "cover": ["Line one", "line two"]  or per-line styles:
+#   [{"text": "FREE AI Agent that", "size": 116, "color": "#111111"}, {"text": "gets you customers", "size": 86, "color": "hero"}]
+#   size = Poppins Bold px (each line shrinks to fit the box if it's too wide); color = hex, "hero" (the caption colour from
+#   the clothes) or "accent" (the video's accent). Default: Poppins Bold 110, ink #111111.
 L = C.get('cover', ['Your title', 'goes here'])
-F = ImageFont.truetype(f'{FD}/Poppins-Bold.ttf', 110)
-ws = [ImageDraw.Draw(Image.new('L', (1, 1))).textlength(s, font=F) for s in L]
-lh = 124; bw = int(min(1040, max(ws) + 100)); bh = 92 + lh * len(L) + 1; x0 = (1080 - bw) // 2; y0 = 262
+def colour(c):
+    c = {'hero': HERO_COLOR or '#111111', 'accent': ACCENT}.get(c, c)
+    return tuple(int(c[i:i + 2], 16) for i in (1, 3, 5)) + (255,)
+lines = []
+for item in L:
+    it = {'text': item} if isinstance(item, str) else dict(item)
+    size = it.get('size', 110)
+    while ImageDraw.Draw(Image.new('L', (1, 1))).textlength(it['text'], font=ImageFont.truetype(f'{FD}/Poppins-Bold.ttf', size)) > 980 and size > 48: size -= 2
+    F = ImageFont.truetype(f'{FD}/Poppins-Bold.ttf', size)
+    lines.append(dict(text=it['text'], F=F, w=ImageDraw.Draw(Image.new('L', (1, 1))).textlength(it['text'], font=F), lh=round(size * 1.13), fill=colour(it.get('color', '#111111'))))
+bw = int(min(1040, max(l_['w'] for l_ in lines) + 100)); bh = 92 + sum(l_['lh'] for l_ in lines); x0 = (1080 - bw) // 2; y0 = 262
 im = Image.new('RGBA', (1080, 1920), (0, 0, 0, 0))
 sh = Image.new('L', im.size, 0); ImageDraw.Draw(sh).rounded_rectangle([x0, y0 + 24, x0 + bw, y0 + bh + 24], 30, fill=70)
 im = Image.composite(Image.new('RGBA', im.size, (24, 24, 32, 255)), im, sh.filter(ImageFilter.GaussianBlur(28)))
 d = ImageDraw.Draw(im); d.rounded_rectangle([x0, y0, x0 + bw, y0 + bh], 30, fill=(255, 255, 255, 255))
-ty = y0 + (bh - len(L) * lh) // 2 - 8
-for i, s in enumerate(L): d.text(((1080 - ws[i]) / 2, ty + i * lh), s, font=F, fill=(17, 17, 17, 255))
-im.save('work/cover.png'); print('cover box', x0, y0, bw, bh, '(widest line must fit: shorten it if bw hit 1040)')
+ty = y0 + 46 - 8
+for l_ in lines:
+    d.text(((1080 - l_['w']) / 2, ty), l_['text'], font=l_['F'], fill=l_['fill']); ty += l_['lh']
+im.save('work/cover.png'); print('cover box', x0, y0, bw, bh, '| line sizes', [l_['F'].size for l_ in lines])
