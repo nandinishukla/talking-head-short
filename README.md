@@ -7,7 +7,7 @@ What it does:
 - builds a J-cut voice track and checks eye contact;
 - rotates through three layouts: full cam, a split with your head popping out of a camera card, and full-frame "luxury tech" graphics with a moving world camera and real motion blur;
 - plans the whole edit as a storyboard and beat table and waits for your approval before rendering;
-- burns in two caption styles: small pill captions over visuals, and big see-through hero words for the hook and key lines; adds a cover title and a CTA comment card;
+- burns in two caption styles: small pill captions over visuals, and big hero words in a solid colour matched to the speaker's clothes for the hook and key lines; adds a cover title and a CTA comment card;
 - synthesizes every sound effect, the riser and the music bed in numpy, and mixes to -14 LUFS;
 - writes a QA'd report.
 
@@ -41,4 +41,4 @@ The motion references in `references/motion-prompts.md` come from [prompt-motion
 The prompts belong to their creators.
 
 ## Licences
-Code: MIT. Fonts in `assets/fonts/` (Poppins, Pacifico, Archivo Black, EB Garamond, IBM Plex Mono, Inter) are under the SIL Open Font License 1.1.
+Code: MIT. Fonts in `assets/fonts/` (Poppins, Archivo Black, EB Garamond, IBM Plex Mono, Inter) are under the SIL Open Font License 1.1.

@@ -1,6 +1,6 @@
 ---
 name: talking-head-short
-description: Edit a raw talking-head recording into a finished, ready-to-post 9:16 short (Instagram Reel, TikTok, YouTube Short) entirely in code. It covers syncing camera and clean audio, transcribing with word timestamps, picking the last good take of every line and cutting retakes, pauses and false starts with a J-cut voice track, and an eye-contact check. Each run gets one of three layouts (full cam, split with the head popping out of a camera card, full-frame "luxury tech" HyperFrames graphic with a moving world camera and motion blur). It plans the edit as a storyboard and beat table and waits for the user's approval before rendering anything. It burns in two caption styles (small pill captions, and big see-through hero words for the hook and key lines), adds a cover title and a CTA comment card, synthesizes SFX, a riser and a music bed in numpy, mixes to -14 LUFS, and writes a report. Use it whenever someone hands you raw footage (a .MP4/.MOV of themselves talking) and wants a short, reel, TikTok, YouTube Short or "edit like a creator", wants retakes removed, captions, B-roll graphics or a vertical cut, or says "edit my video" — even if they don't name the steps.
+description: Edit a raw talking-head recording into a finished, ready-to-post 9:16 short (Instagram Reel, TikTok, YouTube Short) entirely in code. It covers syncing camera and clean audio, transcribing with word timestamps, picking the last good take of every line and cutting retakes, pauses and false starts with a J-cut voice track, and an eye-contact check. Each run gets one of three layouts (full cam, split with the head popping out of a camera card, full-frame "luxury tech" HyperFrames graphic with a moving world camera and motion blur). It plans the edit as a storyboard and beat table and waits for the user's approval before rendering anything. It burns in two caption styles (small pill captions, and big hero words in the speaker's clothing colour for the hook and key lines), adds a cover title and a CTA comment card, synthesizes SFX, a riser and a music bed in numpy, mixes to -14 LUFS, and writes a report. Use it whenever someone hands you raw footage (a .MP4/.MOV of themselves talking) and wants a short, reel, TikTok, YouTube Short or "edit like a creator", wants retakes removed, captions, B-roll graphics or a vertical cut, or says "edit my video" — even if they don't name the steps.
 ---
 
 # Talking-head → finished 9:16 short
@@ -74,14 +74,14 @@ For every named product and every claim (release, quote, number), find the real 
 - "Claude Code" means the Claude desktop app UI unless the speaker is talking about the terminal.
 
 ### 6. Captions and cover (planned now, because the storyboard shows them)
-`$PY $S/captions.py`. Without `"captions.chunks"` it prints an auto draft (pill everywhere, one hero drafted in the hook). Edit it and paste it back. There are two styles:
+`$PY $S/captions.py work/cam1080.mp4` (the camera video is for the hero colour). Without `"captions.chunks"` it prints an auto draft (pill everywhere, one hero drafted in the hook). Edit it and paste it back. There are two styles:
 - **pill** `[a, b, "pill"]`: 1–3 words, small Poppins Bold on a translucent dark rounded box. Use it whenever the speaker talks over visuals or B-roll.
-- **hero** `[a, b, "hero", [big word indices]]`: 2–5 words with 1–2 HUGE see-through words (Archivo Black; the footage shows through the letters, washed bright) between small white script words (Pacifico) above and below. Use it in the hook and on important lines where only the speaker is on screen (full cam, or the card in a split), never over a graphic and never two in a row. Pick words that carry the meaning (the claim, number or benefit), never function words.
+- **hero** `[a, b, "hero", [big word indices]]`: 2–5 words with 1–2 HUGE solid words (Archivo Black) between small words above and below, which are pills in the same style as the pill captions. The big word's colour matches the speaker's clothes: `captions.py work/cam1080.mp4` samples the torso in the first hero frame and prints the colour it picked. It has a deep same-hue outline so it reads over those clothes. Override with `"hero_color": "#RRGGBB"` if the pick is off (busy prints, a jacket over a shirt). Use it in the hook and on important lines where only the speaker is on screen (full cam, or the card in a split), never over a graphic and never two in a row. Pick words that carry the meaning (the claim, number or benefit), never function words.
 
 Set `"cover": [line1, line2]` (write it from the hook if the user gave none, about 14 characters per line at 110 px). Set the pill centre per layout in `"y"` and the hero block centre in `"hero_y"`.
 - Captions must never sit on the face, the card edge or a visual.
 - With a portrait source the split gap is the face, so put pills at about y 1660 on the torso, and check the outro on a real frame.
-- `assemble.py` composites both styles; the hero fill is taken from each final frame.
+- `assemble.py` composites both styles.
 
 ### 7. Storyboard and beat table: STOP for approval
 Nothing gets rendered until the user has seen and approved the plan.
@@ -141,7 +141,7 @@ How the engine works and the rules that matter:
 2. QA list:
    - frames on both sides of every join;
    - head present on the first frame of every split and aligned on fast moves;
-   - a contact sheet of the whole video (`fps=2,tile=12x9`): captions clear of face and visuals, heroes only where the speaker is alone (never two in a row), hero letters readable, zones, nothing dark, frame 0 a clean cover;
+   - a contact sheet of the whole video (`fps=2,tile=12x9`): captions clear of face and visuals, heroes only where the speaker is alone (never two in a row), hero colour matching the clothes and readable, zones, nothing dark, frame 0 a clean cover;
    - `ffprobe` shows 1080×1920 / 60 / 3,226-ish frames, AAC 48 k stereo;
    - `ebur128` on the final;
    - riser end, whoosh peak and join gaps from the stems.

@@ -1,9 +1,11 @@
 """Captions from the FINAL voice-track word timings, in two styles, plus the frame-0 cover. Run from edit/.
 
   PILL  small Poppins Bold white text on a translucent dark rounded box. The default: talking over visuals/B-roll.
-  HERO  a stacked moment: small white script word(s) above, one or two HUGE see-through words (the footage shows
-        through the letters, brightened and washed), small script word(s) below. Example: "everybody / WANTED TO / know".
+  HERO  a stacked moment: small word(s) above as a pill, one or two HUGE solid words in the speaker's clothing colour,
+        small word(s) below as a pill. Example: "everybody / WANTED TO / know".
         Use it in the hook and on important lines where only the speaker is on screen (full cam, or the card in a split).
+        The colour is sampled once per video from the speaker's clothes (torso area of the hook frame), so every
+        video gets its own accent; override with "hero_color": "#RRGGBB".
 
 project.json "captions":
   "chunks": [[first_word, last_word, "pill"], [first_word, last_word, "hero", [big word indices]], ...]
@@ -13,9 +15,12 @@ project.json "captions":
   "y":      {"split": 1027, "cam": 1401, "visual": 1401, "outro": 1171, "<run key>": y}   pill centre per layout
   "hero_y": {"cam": 1380, "split": 1640}                                                  hero block centre
   "cover":  ["Line one", "line two"]
-Writes work/captions.json (+ per-chunk PNG layers in work/captions/) and work/cover.png.
-assemble.py composites them; hero fills are taken from each frame, so the footage really shows through."""
-import json, os, re, shutil
+  "hero_color": "#RRGGBB"   optional; otherwise picked from the clothes (pass the oriented camera video as argv[1])
+Usage: python captions.py [work/cam1080.mp4]
+Writes work/captions.json (+ per-chunk PNG layers in work/captions/), work/hero_color.json and work/cover.png.
+assemble.py composites the layers."""
+import json, os, re, shutil, subprocess, sys, colorsys
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 SK = os.path.dirname(os.path.abspath(__file__)); FD = f'{SK}/../assets/fonts'
 P = json.load(open('work/plan.json')); Wd = P['words']; END = P['END']; runs = P['runs']
@@ -58,10 +63,37 @@ def where(t):
     return runs[-1], True
 
 F_PILL = ImageFont.truetype(f'{FD}/Poppins-Bold.ttf', 64)
-F_SCRIPT = ImageFont.truetype(f'{FD}/Pacifico-Regular.ttf', 104)
 def shadow_of(alpha, blur, opacity, dy):
     s = Image.new('L', alpha.size, 0); s.paste(alpha, (0, dy)); s = s.filter(ImageFilter.GaussianBlur(blur))
     return s.point(lambda v: int(v * opacity))
+
+def clothing_colour(video, t_out):
+    """Dominant clothing colour from the torso area of one camera frame: k-means on the region below the face,
+    ignoring near-black (hair, shadows), near-white (highlights) and skin tones; then tuned for a bold solid word."""
+    E = json.load(open('work/edl.json'))
+    k = max(j for j, s_ in enumerate(E['segs']) if s_['cut'] <= t_out + 1e-9); src = t_out - E['segs'][k]['delta']
+    raw = subprocess.run(['ffmpeg', '-v', 'error', '-ss', f'{src:.3f}', '-i', video, '-frames:v', '1', '-vf', 'scale=270:-2',
+                          '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-'], capture_output=True).stdout
+    h = len(raw) // (270 * 3); img = np.frombuffer(raw[:270 * 3 * h], np.uint8).reshape(h, 270, 3).astype(np.float32) / 255
+    portrait = h > 270
+    y0, y1 = (int(h * .58), int(h * .9)) if portrait else (int(h * .65), h)
+    reg = img[y0:y1, int(270 * .18):int(270 * .82)].reshape(-1, 3)
+    hsv = np.array([colorsys.rgb_to_hsv(*p) for p in reg])
+    skin = (hsv[:, 0] < 0.11) & (hsv[:, 1] > 0.18) & (hsv[:, 1] < 0.6) & (hsv[:, 2] > 0.35)
+    keep = (hsv[:, 2] > 0.22) & (hsv[:, 2] < 0.97) & ~skin
+    px = reg[keep] if keep.sum() > 200 else reg
+    rng = np.random.default_rng(1); cent = px[rng.choice(len(px), 4, replace=False)]
+    for _ in range(15):
+        lab = np.argmin(((px[:, None] - cent[None]) ** 2).sum(-1), 1)
+        cent = np.array([px[lab == i].mean(0) if (lab == i).any() else cent[i] for i in range(4)])
+    share = np.bincount(lab, minlength=4) / len(lab)
+    sat = np.array([colorsys.rgb_to_hsv(*c)[1] for c in cent])
+    c = cent[np.argmax(share * (0.35 + sat))]                  # big AND colourful wins over big grey
+    hh, ss, vv = colorsys.rgb_to_hsv(*c)
+    ss = min(1.0, max(ss * 1.25, 0.35)) if ss > 0.08 else ss   # keep greys grey, give colours some punch
+    vv = min(0.97, max(vv, 0.78))                              # bright enough to read on a dark room
+    r, g, b = colorsys.hsv_to_rgb(hh, ss, vv)
+    return '#%02X%02X%02X' % (round(r * 255), round(g * 255), round(b * 255)), '#%02X%02X%02X' % tuple(round(x * 255) for x in c)
 
 def pill(text):
     """RGBA layer: white bold text with a soft shadow on a 45% dark rounded box"""
@@ -76,7 +108,8 @@ def pill(text):
     return im
 
 def hero(top, big, bottom):
-    """layers: big-word alpha mask (filled per frame with the footage), its shadow, and the script words (RGBA)"""
+    """layers: big-word alpha mask + its shadow (filled with the solid hero colour in assemble.py), and the small
+    words as pills (RGBA): top pill tucked over the big word's top-left, bottom pill under its bottom-right"""
     W = 1080; big = re.sub(r'[.,!?]+$', '', big.upper()); size = 260
     while True:
         F = ImageFont.truetype(f'{FD}/ArchivoBlack-Regular.ttf', size)
@@ -86,20 +119,27 @@ def hero(top, big, bottom):
     bw, bh = r - l, b - t
     Hc = bh + 2 * 150; ox = (W - bw) // 2; oy = 150
     mask = Image.new('L', (W, Hc), 0); ImageDraw.Draw(mask).text((ox - l, oy - t), big, font=F, fill=255)
-    sh = shadow_of(mask, 9, 0.62, 7)
-    sc = Image.new('L', (W, Hc), 0); ds = ImageDraw.Draw(sc)
+    # outline in a deep shade of the same hue: the word keeps the clothing colour but still reads ON those clothes
+    stroke = Image.new('L', (W, Hc), 0)
+    ImageDraw.Draw(stroke).text((ox - l, oy - t), big, font=F, fill=255, stroke_width=7, stroke_fill=255)
+    sh = shadow_of(stroke, 9, 0.62, 7)
+    small = Image.new('RGBA', (W, Hc), (0, 0, 0, 0))
     if top:
-        tl, tt, tr, tb = ds.textbbox((0, 0), top, font=F_SCRIPT)
-        ds.text((max(30, ox - 10) - tl, oy - (tb - tt) * 0.78 - tt), top, font=F_SCRIPT, fill=255)
+        p_ = pill(top); small.alpha_composite(p_, (max(10, ox - 30), max(0, oy - p_.height + 14)))
     if bottom:
-        bl, bt, br, bb = ds.textbbox((0, 0), bottom, font=F_SCRIPT)
-        ds.text((min(W - 30, ox + bw + 10) - (br - bl) - bl, oy + bh - (bb - bt) * 0.18 - bt), bottom, font=F_SCRIPT, fill=255)
-    scs = shadow_of(sc, 6, 0.7, 4)
-    script = Image.alpha_composite(Image.merge('RGBA', [Image.new('L', sc.size, 0)] * 3 + [scs]),
-                                   Image.merge('RGBA', [Image.new('L', sc.size, 255)] * 3 + [sc]))
-    return mask, sh, script, Hc
+        p_ = pill(bottom); small.alpha_composite(p_, (min(W - p_.width - 10, ox + bw - p_.width + 30), min(Hc - p_.height, oy + bh - 14)))
+    return mask, stroke, sh, small, Hc
 
 shutil.rmtree('work/captions', ignore_errors=True); os.makedirs('work/captions')
+HERO_COLOR = C.get('hero_color')
+if not HERO_COLOR and any(c[2] == 'hero' for c in chunks):
+    if len(sys.argv) > 1:
+        first = next(c for c in chunks if c[2] == 'hero')
+        HERO_COLOR, sampled = clothing_colour(sys.argv[1], Wd[first[0]]['s'] + 0.2)
+        print('hero colour picked from the clothes:', HERO_COLOR, '(sampled', sampled + ')')
+    else:
+        HERO_COLOR = '#FFFFFF'; print('no camera video given and no "hero_color": hero words fall back to white')
+json.dump(dict(hero_color=HERO_COLOR), open('work/hero_color.json', 'w'))
 items = []
 for k, c in enumerate(chunks):
     a, b, style = c[0], c[1], c[2]
@@ -113,9 +153,9 @@ for k, c in enumerate(chunks):
         items.append(dict(k=k, style='pill', start=st, end=en, x=(1080 - im.width) // 2, y=y - im.height // 2, text=txt(range(a, b + 1))))
     else:
         bigs = c[3]; top = txt(range(a, bigs[0])); big = txt(bigs); bottom = txt(range(bigs[-1] + 1, b + 1))
-        mask, sh, script, Hc = hero(top, big, bottom); y = HY.get(key, HY.get(r[2], HY['cam']))
-        mask.save(f'work/captions/{k:03d}_mask.png'); sh.save(f'work/captions/{k:03d}_shadow.png'); script.save(f'work/captions/{k:03d}_script.png')
-        items.append(dict(k=k, style='hero', start=st, end=en, x=0, y=y - Hc // 2, text=f'{top} | {big.upper()} | {bottom}'))
+        mask, stroke, sh, small, Hc = hero(top, big, bottom); y = HY.get(key, HY.get(r[2], HY['cam']))
+        stroke.save(f'work/captions/{k:03d}_stroke.png'); mask.save(f'work/captions/{k:03d}_mask.png'); sh.save(f'work/captions/{k:03d}_shadow.png'); small.save(f'work/captions/{k:03d}_small.png')
+        items.append(dict(k=k, style='hero', start=st, end=en, x=0, y=y - Hc // 2, color=HERO_COLOR, text=f'{top} | {big.upper()} | {bottom}'))
 json.dump(items, open('work/captions.json', 'w'), indent=1)
 print(len(items), 'caption chunks:', sum(i['style'] == 'hero' for i in items), 'hero,', sum(i['style'] == 'pill' for i in items), 'pill -> work/captions.json')
 

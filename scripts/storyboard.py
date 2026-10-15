@@ -49,7 +49,7 @@ def sketch(r):
             g.append('<rect x="-16" y="300" width="302" height="216" rx="50" fill="none" stroke="#111" stroke-width="1.5"/>')
     for c in [c for c in caps if a / 1000 <= c['start'] < b / 1000][:1]:
         y = (c['y'] + (60 if c['style'] == 'pill' else 200)) * s
-        col = '#FFE14D' if c['style'] == 'hero' else '#fff'
+        col = c.get('color', '#FFE14D') if c['style'] == 'hero' else '#fff'   # hero marker shows the clothing colour
         g.append(f'<rect x="20" y="{y - 13}" width="230" height="26" rx="6" fill="rgba(0,0,0,.55)"/>'
                  f'<text x="135" y="{y + 5}" text-anchor="middle" font-family="Helvetica" font-weight="700" font-size="12" fill="{col}">'
                  f'{c["style"].upper()} caption</text>')

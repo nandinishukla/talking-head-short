@@ -41,7 +41,10 @@ These are the things that actually went wrong or cost time on the first short. E
 - When polling a background job, `pgrep -f "assemble.py"` matches the polling shell's own command line, so the wait loop never ends. Poll for the output file or the PID instead.
 
 ## Captions
-- Captions are composited in Python (`assemble.py`), not libass, because the hero style's letters must be filled with the live frame behind them. Pills are pre-rendered PNG layers; the hero big word is a mask filled per frame with the footage enlarged 12%, desaturated 30%, contrast up and washed 62% toward white, over a soft dark shadow. A weaker wash (45%) read grey and muddy over a dark room.
+- Captions are composited in Python (`assemble.py`), not libass: pills are pre-rendered PNG layers, and the hero word is a mask + outline + shadow filled with a solid colour per frame.
+- The hero colour comes from the speaker's clothes, via k-means on the torso area of the first hero frame, skipping near-black (hair, shadow), near-white and skin tones. The pick favours a cluster that is both large and colourful. It is then lifted to at least 78% brightness and given a little more saturation. On the Harvey footage it picked lavender #8981C7 from the shirt.
+- A word in the exact clothing colour disappears where it overlaps those clothes. The fix that keeps the match is a 7 px outline in a deep shade of the same hue (about 32% brightness) plus a soft shadow. Don't change the colour itself.
+- Tuck the small pills only about 14 px into the big word; deeper tucks cover letters.
 - A translucent pill box nearly disappears over a dark background; that's acceptable (the text keeps its shadow), but check pills over light graphics.
 - Strip trailing punctuation from hero big words ("CUSTOMERS." looks wrong at 230 px).
 

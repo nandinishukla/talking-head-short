@@ -110,21 +110,19 @@ def draw_captions(out, t):
         u = t - c['start']
         if c['style'] == 'pill':                                     # quick 80 ms fade + 4% settle
             blit(out, scaled(layer(c['k'], 'pill'), 0.96 + 0.04 * ease_out(u / 0.12)), c['x'], c['y'], ease_out(u / 0.08))
-        else:                                                         # hero: big see-through word lands, script fades in
+        else:                                                         # hero: big solid word lands, pills fade in
             s = 1.08 - 0.08 * ease_out(u / 0.22); op = ease_out(u / 0.10)
             mask = scaled(layer(c['k'], 'mask', cv2.IMREAD_GRAYSCALE), s)[..., None] * op
             sh = scaled(layer(c['k'], 'shadow', cv2.IMREAD_GRAYSCALE), s)[..., None] * op
+            st = scaled(layer(c['k'], 'stroke', cv2.IMREAD_GRAYSCALE), s)[..., None] * op
             y0 = c['y']; h = mask.shape[0]; y1 = min(1920, y0 + h); ys = max(0, y0)
-            reg = out[ys:y1]; m = mask[ys - y0:y1 - y0]; shd = sh[ys - y0:y1 - y0]
-            # the footage behind the band, enlarged 12%, desaturated a touch and washed 45% toward white
-            band = cv2.resize(reg, None, fx=1.12, fy=1.12, interpolation=cv2.INTER_LINEAR)
-            oy = (band.shape[0] - reg.shape[0]) // 2; ox = (band.shape[1] - 1080) // 2
-            fill = band[oy:oy + reg.shape[0], ox:ox + 1080]
-            g = fill.mean(axis=2, keepdims=True); fill = (fill * 0.7 + g * 0.3)
-            fill = np.clip((fill - 128) * 1.35 + 128, 0, 255) * 0.38 + 255 * 0.62   # high-key texture: bright, still see-through
-            reg[:] = reg * (1 - shd)                                  # shadow under the letters keeps them readable
-            reg[:] = reg * (1 - m) + fill * m
-            blit(out, layer(c['k'], 'script'), c['x'], y0, ease_out((u - 0.04) / 0.14))
+            reg = out[ys:y1]; m = mask[ys - y0:y1 - y0]; shd = sh[ys - y0:y1 - y0]; stk = st[ys - y0:y1 - y0]
+            col = np.array([int(c['color'][i:i + 2], 16) for i in (1, 3, 5)], np.float32)   # solid clothing colour
+            deep = col * 0.32                                         # same hue, deep: the outline
+            reg[:] = reg * (1 - shd)                                  # soft shadow under everything
+            reg[:] = reg * (1 - stk) + deep * stk
+            reg[:] = reg * (1 - m) + col * m
+            blit(out, layer(c['k'], 'small'), c['x'], y0, ease_out((u - 0.04) / 0.12))
     return np.clip(out, 0, 255).astype(np.uint8)
 
 if ONLY is None:
