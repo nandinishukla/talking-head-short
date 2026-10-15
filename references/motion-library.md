@@ -42,7 +42,8 @@ Sources to browse (by hand, as a viewer):
 - Avoid: particle bursts, glows, lens flares, camera shake, RGB split, crossfades, generic gradients, bouncy easing, holds over half a second, template looks. Where it clashes with the house rules (16:9 canvas, "camera never still" vs. the house's frame 0 at rest, its own brand palette vs. the near-white world), the house rules in `brief.md` win.
 - Variant: a 30 s version of the same template that takes its visual style from a reference video the user supplies (download it, study its look and pacing, then apply it within these rules). With 30 s there is room for three or four product moments at a calmer pace.
 - Variant: a 40 s "product film" version with the same rules. At that length, give each product moment its own small arc (UI state → action → result) and keep the beat-driven changes, but let the camera breathe longer inside each moment.
-- Full prompt: private, in `motion-prompts.md` (base, 30 s and 40 s variants; not in this repo).
+- Variant: a generic 30 s explainer for any product, with the same rules. It puts the weight on a strong script, good colours and good music, so people watch it more than once. For a short, that means the narration's hook, problem → product moments → payoff arc drives the beats, not the other way round.
+- Full prompt: private, in `motion-prompts.md` (base, 30 s, 40 s and explainer variants; not in this repo).
 
 ### gallery-3d-film-camera
 - Link: prompt-motion.com (entry link and creator still to add)
