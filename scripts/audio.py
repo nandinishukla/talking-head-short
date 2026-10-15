@@ -9,7 +9,8 @@ project.json "sfx_profile": "creator" (default: levels and transition sounds mea
 project.json "music": {"mode": "synth" | "file" | "none", "file": "path/to/track.mp3", "start": 0.0, "lufs": -24,
   "bpm": 110, "chords": [[midi...], ...]}
   synth = the original code-composed bed; file = the creator's own copyright-free track (looped if short, trimmed to END,
-  5 ms declick, 800 ms fade, one flat level); none = no music bed (the creator's AI Iceberg edit has none)."""
+  5 ms declick, 800 ms fade, one flat level); none = no bed. Default level: -34 LUFS with the creator profile (their edits
+  run the bed ~20 LU under the voice), -24 LUFS with the house profile."""
 import json, re, glob, os
 import numpy as np, soundfile as sf, pyloudnorm as pyln
 from scipy.signal import butter, sosfilt, sosfiltfilt
@@ -234,7 +235,8 @@ if MODE == 'none': mus = np.zeros((N, 2))
 else:
     mus[:int(0.005 * SR)] *= np.linspace(0, 1, int(0.005 * SR))[:, None]
     fo = int(0.8 * SR); mus[-fo:] *= np.linspace(1, 0, fo)[:, None]
-    mus *= 10 ** ((MUS.get('lufs', -24.0) - meter.integrated_loudness(mus)) / 20)   # one flat level, no ducking
+    MUS_LUFS = MUS.get('lufs', -34.0 if PROFILE == 'creator' else -24.0)              # creator edits: bed ~20 LU under the voice
+    mus *= 10 ** ((MUS_LUFS - meter.integrated_loudness(mus)) / 20)   # one flat level, no ducking
 
 st = lambda x: np.stack([x, x], 1) if x.ndim == 1 else x
 stems = {'voice': voice, 'sfx': st(sfx), 'riser': st(riser), 'music': mus}

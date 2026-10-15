@@ -186,7 +186,7 @@ Set `"cta_style": "box"` or `"pill"` in project.json and say which one in the st
    - voice normalized to −14 LUFS;
    - SFX in the creator's measured style (`references/sound-profile.md`, `"sfx_profile": "creator"`, the default). These are the composition events plus an automatic swoosh peaking on every cut into a graphic and a sub boom on every cut back to the speaker. Peaks relative to the voice peak: ticks −21, pops −22, thuds −19, clicks −21, chimes −13, swooshes and whip whooshes −14, sub booms −8, keys/ticks −24 dB. `"sfx_profile": "house"` restores the original quieter, cut-free palette;
    - a 2.6 s riser whose audible end lands exactly on the hook join (−14 dB);
-   - music per `"music": {"mode": ...}`: `"file"` is the creator's own copyright-free track (ask for it; it's looped or trimmed to END, one flat level at `"lufs"`, default −24, 800 ms fade); `"none"` means no bed, as in the creator's AI Iceberg edit; `"synth"` is the code-composed 110 BPM warm bed (default when nothing is given).
+   - music per `"music": {"mode": ...}`: `"file"` is the creator's own copyright-free track (ask for it; it's looped or trimmed to END, 800 ms fade); `"synth"` is the code-composed 110 BPM warm bed (default when nothing is given); `"none"` means no bed. One flat level at `"lufs"`, default −34 LUFS (about 20 LU under the voice, measured from the creator's edits; −24 with the house profile).
 2. `$PY $S/master.py` sums the stems, applies a look-ahead true-peak limiter only where needed (≤ −1 dBTP), and measures every stem and the master.
 
 ### 11. Assemble and QA (look at real frames; don't assume)

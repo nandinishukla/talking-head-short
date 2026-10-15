@@ -22,7 +22,7 @@ res['master'] = measure('final_master.wav')
 json.dump(res, open('work/loudness.json', 'w'), indent=1)
 for k, v in res.items(): print(f'{k:7s} I {v["I"]:7.1f} LUFS   TP {v["TP"]:6.1f} dBTP')
 cfg = json.load(open('project.json')) if __import__('os').path.exists('project.json') else {}
-mus = cfg.get('music', {}); want = mus.get('lufs', -24.0)
+mus = cfg.get('music', {}); want = mus.get('lufs', -34.0 if cfg.get('sfx_profile', 'creator') == 'creator' else -24.0)
 music_ok = mus.get('mode') == 'none' or abs(res['music']['I'] - want) <= 0.5
 ok = abs(res['voice']['I'] + 14) <= 0.5 and music_ok and res['master']['TP'] <= -1.0
 print('LEVELS OK' if ok else 'LEVELS OFF TARGET')

@@ -104,7 +104,7 @@ Synthesize the effects in code (numpy/scipy, or the Web Audio API with OfflineAu
   - nothing on camera steps, pushes or glides
   - Levels are peak against the voice's peak, as listed.
 - Intro riser (stems/riser.wav): a low, swelling riser, about 2-3 s long, whose audible end lands exactly on the join where the hook ends and the first point starts. It's the one sound allowed to rise into a cut. Peaks 14 dB under the voice.
-- Music (stems/music.wav): my own copyright-free track when I supply it (project.json "music": {"mode": "file", "file": ..., "lufs": -24}), looped or trimmed to END, 5 ms declick, 800 ms fade out, ONE flat level 10 LU under the voice, no ducking. My edits often run without a bed at all ("mode": "none"). If I give no track, compose an original minimal bed in code ("mode": "synth": modern, warm, 100-120 BPM, no vocals, no lead melody).
+- Music (stems/music.wav): a quiet bed under the whole video, ONE flat level about 20 LU under the voice (about -34 LUFS; measured from my own edits), no ducking, 5 ms declick, 800 ms fade out, looped or trimmed to END. Use my own copyright-free track when I supply it (project.json "music": {"mode": "file", "file": ...}); otherwise compose an original minimal bed in code ("mode": "synth": modern, warm, 100-120 BPM, no vocals, no lead melody). "mode": "none" only if I ask for no music.
 - Master: sum the four stems with no further per-stem changes. Target about -14 LUFS integrated, true peak -1 dBTP at most. A transparent limiter only if a peak goes over; no pumping, no clipping. Measure with ffmpeg ebur128 and report the numbers for each stem and the master.
 
 8. ASSEMBLE AND RENDER

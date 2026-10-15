@@ -3,8 +3,10 @@
 Source: the creator's "AI Iceberg" short (17.7 s, edited in DaVinci Resolve). The full mix was separated into vocals / drums / bass / other with Demucs (htdemucs), then each effect was detected (spectral flux on the non-vocal stems), classified by duration, low/high-band energy and tonality, and matched to the frame on screen at that moment. `scripts/audio.py` uses these levels by default (`"sfx_profile": "creator"`).
 
 ## Music
-- **No music bed in this edit.** Outside the effects, the non-voice audio sits about **39 dB below the voice** (−55.5 dBFS vs −16.6 dBFS RMS) and has no steady beat (periodicity strength 0.08). The faint partials around 1.1–1.3 kHz are voice bleed, not instruments. Bass stem: −62 LUFS (essentially empty).
-- So the track can't be identified from this clip. When the creator names or supplies their copyright-free track, set `"music": {"mode": "file", "file": "...", "lufs": -24}`. To match this edit exactly, use `"mode": "none"`.
+- **A quiet music bed runs under the whole clip**, about **20 LU below the voice**. I measured it on the stereo image: the voice is mono, but the side channel carries steady content 21.5 dB below the mid (−34.4 LUFS on its own), and the quietest 20 ms windows between words never fall below about −36 dBFS. The noise floor of a dry recording is near −79 dBFS.
+- My first pass said "no bed". That was wrong: Demucs folded the soft bed into the vocal stem, so the music stems looked empty. Corrected after a second measurement; the creator confirmed there is music.
+- The track itself can't be identified from the clip (no name, voice on top). When the creator supplies it, use `"music": {"mode": "file", "file": "...", "lufs": -34}`. Until then, the code-composed bed (`"mode": "synth"`) at the same quiet level is the stand-in.
+- Level rule from this edit: music about **20 LU under the voice (about −34 LUFS)**, much quieter than the original brief's 10 LU, so it sits as texture under dense effects.
 
 ## Effects: what plays on what (peak level relative to the voice peak)
 | Visual event | Sound | Measured | Level |
