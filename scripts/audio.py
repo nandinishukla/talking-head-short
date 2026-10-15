@@ -1,8 +1,15 @@
 """Synthesize SFX, riser and music; normalize the voice; write the four full-length stems. Run from edit/.
 SFX come from each composition's <script type="application/json" id="events"> block (run-relative times):
-  pop | click | chime | whoosh (t = whip midpoint) | keys (t,t1,n) | ticks (t,t1)
+  pop | click | chime | whoosh (t = whip midpoint) | keys (t,t1,n) | ticks (t,t1) | thud | boom | flash | swoosh (t = peak)
 Compositions are work/gfx/compositions/<run key lowercased>.html (R1 -> r1.html) plus cta.html for the last run.
-Optional project.json "music": {"bpm": 110, "chords": [[midi...], ...]}  (first note of each chord = bass root)."""
+project.json "sfx_profile": "creator" (default: levels and transition sounds measured from the creator's own edits,
+  see references/sound-profile.md) or "house" (the original brief's quieter, cut-free palette).
+  creator profile also adds a transition sound on every layout change: a swoosh peaking on the cut when the picture
+  goes to a graphic or a screen, a sub boom when it comes back to the speaker (skipped where a whip whoosh already sits).
+project.json "music": {"mode": "synth" | "file" | "none", "file": "path/to/track.mp3", "start": 0.0, "lufs": -24,
+  "bpm": 110, "chords": [[midi...], ...]}
+  synth = the original code-composed bed; file = the creator's own copyright-free track (looped if short, trimmed to END,
+  5 ms declick, 800 ms fade, one flat level); none = no music bed (the creator's AI Iceberg edit has none)."""
 import json, re, glob, os
 import numpy as np, soundfile as sf, pyloudnorm as pyln
 from scipy.signal import butter, sosfilt, sosfiltfilt
@@ -57,6 +64,29 @@ def s_chime():
         tone = (np.sin(2 * np.pi * f * t) + 0.25 * np.sin(2 * np.pi * 2 * f * t) * env_exp(m, 0.08)) * env_exp(m, 0.32)
         tone[:96] *= np.linspace(0, 1, 96); out[o:] += tone * (1.0 if k else 0.85)
     return out
+def s_thud():
+    """soft low thud: an icon or element landing (measured ~200 Hz centroid, ~0.2 s)"""
+    n = int(0.22 * SR); t = tt(n); f = 110 * np.exp(-t / 0.04) + 55
+    x = np.sin(2 * np.pi * np.cumsum(f) / SR) * env_exp(n, 0.06) + lp(rng.standard_normal(n), 400) * env_exp(n, 0.01) * 0.3
+    x[:48] *= np.linspace(0, 1, 48); return x
+def s_boom():
+    """deep sub boom: the cut back to the speaker / a big reveal (measured ~55 Hz, ~0.3-0.8 s)"""
+    n = int(0.9 * SR); t = tt(n); f = 70 * np.exp(-t / 0.12) + 38
+    x = np.sin(2 * np.pi * np.cumsum(f) / SR) * env_exp(n, 0.28) + lp(rng.standard_normal(n), 220) * env_exp(n, 0.05) * 0.25
+    x = np.tanh(1.4 * x); x[:96] *= np.linspace(0, 1, 96); return x
+def s_flash():
+    """bright tick: a white flash / hard visual switch (measured ~7 kHz centroid, ~0.08 s)"""
+    n = int(0.08 * SR); x = bp(rng.standard_normal(n), 3500, 11000) * env_exp(n, 0.012)
+    x += np.sin(2 * np.pi * 5200 * tt(n)) * env_exp(n, 0.008) * 0.3; x[:12] *= np.linspace(0, 1, 12); return x
+def s_swoosh():
+    """transition swoosh with body (measured ~0.6-0.9 s, centroid ~500-800 Hz); returns (signal, peak index)"""
+    L = 0.8; n = int(L * SR); t = tt(n); noise = rng.standard_normal(n); out = np.zeros(n); blk = 1024
+    for i in range(0, n, blk):
+        u = (i + blk / 2) / n; fc = 250 + 1100 * u ** 1.6
+        y = bp(noise[max(0, i - 2048):i + blk], fc * 0.55, fc * 1.7)[-min(blk, n - i):]; out[i:i + len(y)] = y
+    e = np.where(t < 0.62 * L, (t / (0.62 * L)) ** 2.2, np.exp(-(t - 0.62 * L) / 0.07))
+    x = out * e + np.sin(2 * np.pi * np.cumsum(90 + 60 * t / L) / SR) * e * 0.35
+    return x, int(np.argmax(np.abs(x)))
 def s_whoosh(var):
     """low airy whoosh; loudest point at its centre (returned with centre index)"""
     L = [0.95, 1.1, 0.85, 1.0][var]; n = int(L * SR); t = tt(n); c = n // 2
@@ -97,25 +127,44 @@ for comp, rn in comp_run.items():
         e['run'] = rn; events.append(e)
 events.sort(key=lambda e: e['t'])
 
+# peak levels relative to the voice peak (dB)
+PROFILE = CFG.get('sfx_profile', 'creator')
+LV = (dict(pop=-22, click=-21, chime=-13, whoosh=-14, keys=-24, ticks=-25, thud=-19, boom=-8, flash=-21, swoosh=-14)
+      if PROFILE == 'creator' else
+      dict(pop=-10, click=-10, chime=-10, whoosh=-9, keys=-16, ticks=-16, thud=-12, boom=-10, flash=-12, swoosh=-9))
+if PROFILE == 'creator':   # transition sounds on layout changes, as in the creator's own edits
+    whips = [e['t'] for e in events if e['type'] == 'whoosh']
+    for a, b in zip(P['runs'], P['runs'][1:]):
+        tc = b[0] / 1000
+        if tc < P['runs'][0][1] / 1000 + 0.01 or any(abs(w - tc) < 0.35 for w in whips): continue   # riser owns the hook join
+        if b[2] == 'cam' and a[2] != 'cam': events.append(dict(t=tc, type='boom', run=b[3].split()[0], auto=True))
+        elif b[2] != 'cam': events.append(dict(t=tc, type='swoosh', run=b[3].split()[0], auto=True))
+    events.sort(key=lambda e: e['t'])
 sfx = np.zeros(N); log = []
 wv = 0
 for e in events:
     ty = e['type']
-    if ty == 'pop': place(sfx, s_pop(), e['t'], -10); log.append((e['t'], 'pop (card lands)', e['run']))
-    elif ty == 'click': place(sfx, s_click(), e['t'], -10); log.append((e['t'], 'click (button press)', e['run']))
-    elif ty == 'chime': place(sfx, s_chime(), e['t'], -10); log.append((e['t'], 'chime (confirmation)', e['run']))
+    if ty == 'pop': place(sfx, s_pop(), e['t'], LV['pop']); log.append((e['t'], 'pop (card lands)', e['run']))
+    elif ty == 'click': place(sfx, s_click(), e['t'], LV['click']); log.append((e['t'], 'click (button press)', e['run']))
+    elif ty == 'chime': place(sfx, s_chime(), e['t'], LV['chime']); log.append((e['t'], 'chime (confirmation / stat reveal)', e['run']))
+    elif ty == 'thud': place(sfx, s_thud(), e['t'], LV['thud']); log.append((e['t'], 'thud (icon / element lands)', e['run']))
+    elif ty == 'flash': place(sfx, s_flash(), e['t'], LV['flash']); log.append((e['t'], 'flash tick (white flash / hard switch)', e['run']))
+    elif ty == 'boom': place(sfx, s_boom(), e['t'], LV['boom']); log.append((e['t'], 'sub boom (back to the speaker)' if e.get('auto') else 'sub boom', e['run']))
+    elif ty == 'swoosh':
+        x, c = s_swoosh(); place(sfx, x, e['t'] - c / SR, LV['swoosh'])
+        log.append((e['t'], 'swoosh (layout change, peak on the cut)' if e.get('auto') else 'swoosh', e['run']))
     elif ty == 'whoosh':
         x, c = s_whoosh(wv % 4)
         c = int(np.argmax(np.convolve(np.abs(x), np.ones(480) / 480, 'same')))   # measured loudest point
-        place(sfx, x, e['t'] - c / SR, -9); log.append((e['t'], f'whoosh v{wv % 4 + 1} (whip midpoint)', e['run'])); wv += 1
+        place(sfx, x, e['t'] - c / SR, LV['whoosh']); log.append((e['t'], f'whoosh v{wv % 4 + 1} (whip midpoint)', e['run'])); wv += 1
     elif ty == 'keys':
         n = e.get('n', 8); ts = np.linspace(e['t'], e['t1'], n)
-        for k, t0 in enumerate(ts): place(sfx, s_key() * (0.85 + 0.15 * rng.random()), t0 + 0.004 * rng.standard_normal(), -16)
+        for k, t0 in enumerate(ts): place(sfx, s_key() * (0.85 + 0.15 * rng.random()), t0 + 0.004 * rng.standard_normal(), LV['keys'])
         log.append((e['t'], f'key presses x{n} until {e["t1"]:.2f}', e['run']))
     elif ty == 'ticks':
         t0 = e['t']; k = 0
         while t0 < e['t1']:
-            place(sfx, s_tick(), t0, -16 - 3 * rng.random()); t0 += 0.045 + 0.02 * rng.random(); k += 1
+            place(sfx, s_tick(), t0, LV['ticks'] - 3 * rng.random()); t0 += 0.045 + 0.02 * rng.random(); k += 1
         log.append((e['t'], f'tick stream x{k} until {e["t1"]:.2f}', e['run']))
 
 # ---------------- riser: ends exactly on the hook join ----------------
@@ -132,8 +181,16 @@ r[-int(0.004 * SR):] *= np.linspace(1, 0, int(0.004 * SR))
 riser = np.zeros(N); place(riser, r, JOIN - L, -14)
 log.append((JOIN - L, f'riser start (ends {JOIN:.3f} on hook join)', 'R1'))
 
-# ---------------- music: 110 BPM warm minimal bed ----------------
-BPM = CFG.get('music', {}).get('bpm', 110); beat = 60 / BPM
+# ---------------- music ----------------
+MUS = CFG.get('music', {}); MODE = MUS.get('mode', 'synth')
+def file_bed(path):
+    """the creator's own track: decoded to 48 kHz stereo, looped if short, trimmed to END"""
+    import subprocess
+    raw = subprocess.run(['ffmpeg', '-v', 'error', '-ss', str(MUS.get('start', 0)), '-i', path, '-f', 'f32le', '-ac', '2', '-ar', str(SR), '-'],
+                         capture_output=True, check=True).stdout
+    a = np.frombuffer(raw, np.float32).reshape(-1, 2).astype(np.float64)
+    reps = int(np.ceil(N / len(a))); return np.tile(a, (reps, 1))[:N]
+BPM = MUS.get('bpm', 110); beat = 60 / BPM
 def note(m): return 440 * 2 ** ((m - 69) / 12)
 chords = CFG.get('music', {}).get('chords', [[50, 57, 60, 64, 65], [46, 53, 57, 60, 62], [41, 48, 52, 57, 60], [48, 55, 57, 60, 64]])  # Dm9 Bbmaj9 Fmaj7 C6
 mus = np.zeros((N + SR, 2))
@@ -172,9 +229,12 @@ for b in range(nb):
         pl = (np.sin(2 * np.pi * note(m) * t) + 0.3 * np.sin(4 * np.pi * note(m) * t)) * env_exp(n, 0.09)
         add(mus, lp(pl, 2500) * 0.035, t0 + s16 * beat / 4, 0.3 if s16 % 2 else -0.3)
 mus = mus[:N]
-mus[:int(0.005 * SR)] *= np.linspace(0, 1, int(0.005 * SR))[:, None]
-fo = int(0.8 * SR); mus[-fo:] *= np.linspace(1, 0, fo)[:, None]
-mus *= 10 ** ((-24.0 - meter.integrated_loudness(mus)) / 20)
+if MODE == 'file': mus = file_bed(MUS['file'])
+if MODE == 'none': mus = np.zeros((N, 2))
+else:
+    mus[:int(0.005 * SR)] *= np.linspace(0, 1, int(0.005 * SR))[:, None]
+    fo = int(0.8 * SR); mus[-fo:] *= np.linspace(1, 0, fo)[:, None]
+    mus *= 10 ** ((MUS.get('lufs', -24.0) - meter.integrated_loudness(mus)) / 20)   # one flat level, no ducking
 
 st = lambda x: np.stack([x, x], 1) if x.ndim == 1 else x
 stems = {'voice': voice, 'sfx': st(sfx), 'riser': st(riser), 'music': mus}

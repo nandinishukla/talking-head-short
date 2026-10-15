@@ -80,19 +80,20 @@ The style is luxury tech: one bright world of floating white cards, and a camera
 - Caption position per run, never on my face, the card edge or a visual: pills in the split = centred in the gap, y 941-1114 (for a portrait source this gap is my face: use the card over my torso instead); full cam and most visuals = bottom, y 1267-1536; a visual with low content = top, y 365-634; outro = centre, y 1037-1306 (keep it off my chin and above the CTA box). Hero blocks sit over my chest on full cam (centre about y 1380) or on the card in a split.
 - CTA card, outro only, lower third (box 43, 1344, 994x276): one centred comment box on a transparent canvas, a default avatar, the keyword from my CTA line typed with a blinking caret, then a Post button press. Nothing else: no panel, no background, no "DM me", no platform text.
 
-7. AUDIO: SYNTHESIZE EVERYTHING, THEN MIX TO THESE LEVELS
-Synthesize with numpy/scipy, or the Web Audio API rendered offline with OfflineAudioContext. Clean, modern and premium, never cartoony.
+7. AUDIO: MIX TO THESE LEVELS
+Synthesize the effects in code (numpy/scipy, or the Web Audio API with OfflineAudioContext); the only outside audio allowed is my own music track. Clean, modern and premium, never cartoony.
 - Voice (stems/voice.wav): the J-cut track from step 2, loudness-normalized to -14 LUFS integrated.
-- SFX (stems/sfx.wav), one sound per meaningful VISIBLE event only:
-  - a soft bubbly click on real button presses and taps
-  - a short soft key press on typing (a light tick stream for longer typing or data streaming)
-  - a dull soft pop on a card, tile or device landing
-  - a gentle two-note notification chime on an answer, modal or confirmation
-  - a LOW, airy whoosh (filtered noise) whose loudest moment lands exactly on the midpoint of each whip, and only on whips: at most one per run, three per short. Rotate 3-4 variants so no two in a row repeat.
-  - Nothing on layout cuts, camera steps, pushes, glides or zooms. A logo lockup and any CTA under it get a whoosh or nothing, never a UI sound.
-  - Levels, peak against the voice's peak: clicks, pops and chimes -10 dB, whooshes -9 dB, key presses and ticks -16 dB.
+- SFX (stems/sfx.wav): my own style, measured from my edits (references/sound-profile.md). Dense, about 1.4 sounds per second, one per visible change, synthesized in code to match:
+  - a bright tick on a white flash or hard visual switch (-21 dB)
+  - a pop when a card or graphic lands (-22 dB); a soft low thud for each icon or logo that pops in (-19 dB)
+  - a click on button presses, taps and text/state changes in a screen recording (-21 dB); key presses and tick streams for typing and streaming data, kept low (-24 dB)
+  - a chime or shimmer when a number or stat appears, or on a confirmation (-13 dB)
+  - LAYOUT CUTS GET SOUNDS: a swoosh with body (0.6-0.9 s, rising, loudest exactly on the cut) when the picture goes from me to a graphic or screen recording (-14 dB), and a deep sub boom on the cut back to me (-8 dB)
+  - a low airy whoosh on each whip, loudest on its midpoint (-14 dB); no separate transition sound when a whip already carries the cut
+  - nothing on camera steps, pushes or glides
+  - Levels are peak against the voice's peak, as listed.
 - Intro riser (stems/riser.wav): a low, swelling riser, about 2-3 s long, whose audible end lands exactly on the join where the hook ends and the first point starts. It's the one sound allowed to rise into a cut. Peaks 14 dB under the voice.
-- Music (stems/music.wav): an original instrumental bed. Modern, minimal, warm electronic, 100-120 BPM, no vocals, no lead melody fighting the voice. Full length, beat 1 on frame 1 (no fade in, only a 5 ms declick), an 800 ms fade out at the end. ONE flat level for the whole video: no ducking, no automation. Set it 10 LU under the voice (about -24 LUFS integrated).
+- Music (stems/music.wav): my own copyright-free track when I supply it (project.json "music": {"mode": "file", "file": ..., "lufs": -24}), looped or trimmed to END, 5 ms declick, 800 ms fade out, ONE flat level 10 LU under the voice, no ducking. My edits often run without a bed at all ("mode": "none"). If I give no track, compose an original minimal bed in code ("mode": "synth": modern, warm, 100-120 BPM, no vocals, no lead melody).
 - Master: sum the four stems with no further per-stem changes. Target about -14 LUFS integrated, true peak -1 dBTP at most. A transparent limiter only if a peak goes over; no pumping, no clipping. Measure with ffmpeg ebur128 and report the numbers for each stem and the master.
 
 8. ASSEMBLE AND RENDER
@@ -102,7 +103,7 @@ Build the picture from the cut plan: full cam runs from my footage, split runs a
 - Frames on both sides of every join: the new take shows from its first frame, the old one up to its last.
 - The head and the card stay aligned on fast head moves, and the head is there from the FIRST frame of every split.
 - A contact sheet of the whole video: captions clear of my face and the visuals, pill vs hero choices (heroes only in the hook or over me alone, never two in a row), content inside its zones, no grid, nothing dark, frame 0 a clean cover.
-- Audio: every SFX lands on its visual event, whooshes only on whip midpoints, the riser ends on the intro join, no join gap over 150 ms, the levels above hit within 0.5 LU.
+- Audio: every SFX lands on its visual event, whip whooshes on whip midpoints, swooshes peak on the cut into graphics and sub booms on the cut back to me, the riser ends on the intro join, no join gap over 150 ms, the levels above hit within 0.5 LU.
 Fix anything that fails and re-export. Don't hand it back until it passes.
 
 REPORT

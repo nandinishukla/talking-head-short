@@ -9,6 +9,7 @@ The pipeline takes one raw recording (plus an optional clean-audio file) to `edi
 
 - **The standard:** `references/brief.md` is the full house brief, with every number for levels, geometry, timing, type and colour. When this file and the brief disagree on a number, the brief wins.
 - **Read before starting:** `references/lessons.md` covers the traps that cost hours on the first run.
+- **Sound profile:** `references/sound-profile.md` has the creator's sound-effect style and levels, measured from their own edit.
 - **Motion library:** `references/motion-library.md` holds the user's curated motion references, the house look the graphics follow.
 - **Examples:** `references/examples/` holds the graphics from the first short (r1–r9 plus cta). `references/example-report.md` is a finished report.
 
@@ -122,7 +123,7 @@ How the engine works and the rules that matter:
   - near-white radial ground and the three-layer shadow;
   - nothing dark, no grid;
   - animate the action, never label it.
-- Every visible sound-worthy event goes in the composition's `<script type="application/json" id="events">` (pop / click / chime / whoosh at the whip midpoint / keys / ticks, run-relative). The audio step reads these, so SFX always land on their visuals.
+- Every visible sound-worthy event goes in the composition's `<script type="application/json" id="events">` (pop / click / chime / thud for icons landing / flash for white flashes / whoosh at the whip midpoint / keys / ticks, run-relative). The audio step reads these, so SFX always land on their visuals.
 - `bash $S/render_gfx.sh draft r1 r2 …` then **look at every contact sheet**. When they're right, run `bash $S/render_gfx.sh final …` (240 fps → `tmix=frames=3,fps=60`) and `bash $S/render_gfx.sh cta`. Render one at a time on 8 GB machines.
 
 ### 9. Camera track and mattes
@@ -132,9 +133,9 @@ How the engine works and the rules that matter:
 ### 10. Audio
 1. `$PY $S/audio.py` writes:
    - voice normalized to −14 LUFS;
-   - SFX from the composition events, peaks relative to the voice peak: clicks/pops/chimes −10 dB, whooshes −9 dB, keys/ticks −16 dB;
+   - SFX in the creator's measured style (`references/sound-profile.md`, `"sfx_profile": "creator"`, the default). These are the composition events plus an automatic swoosh peaking on every cut into a graphic and a sub boom on every cut back to the speaker. Peaks relative to the voice peak: ticks −21, pops −22, thuds −19, clicks −21, chimes −13, swooshes and whip whooshes −14, sub booms −8, keys/ticks −24 dB. `"sfx_profile": "house"` restores the original quieter, cut-free palette;
    - a 2.6 s riser whose audible end lands exactly on the hook join (−14 dB);
-   - a 110 BPM warm bed at −24 LUFS: one flat level, beat 1 on sample 1, 800 ms fade to END. Override with `"music": {"bpm", "chords"}`.
+   - music per `"music": {"mode": ...}`: `"file"` is the creator's own copyright-free track (ask for it; it's looped or trimmed to END, one flat level at `"lufs"`, default −24, 800 ms fade); `"none"` means no bed, as in the creator's AI Iceberg edit; `"synth"` is the code-composed 110 BPM warm bed (default when nothing is given).
 2. `$PY $S/master.py` sums the stems, applies a look-ahead true-peak limiter only where needed (≤ −1 dBTP), and measures every stem and the master.
 
 ### 11. Assemble and QA (look at real frames; don't assume)
@@ -145,7 +146,7 @@ How the engine works and the rules that matter:
    - a contact sheet of the whole video (`fps=2,tile=12x9`): captions clear of face and visuals, heroes only where the speaker is alone (never two in a row), hero colour matching the clothes and readable, zones, nothing dark, frame 0 a clean cover;
    - `ffprobe` shows 1080×1920 / 60 / 3,226-ish frames, AAC 48 k stereo;
    - `ebur128` on the final;
-   - riser end, whoosh peak and join gaps from the stems.
+   - riser end, whip-whoosh and transition-swoosh peaks, sub booms on the cuts back to the speaker, and join gaps from the stems.
 3. Fix, re-export, and repeat until everything passes.
 
 ### 12. Report
