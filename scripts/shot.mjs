@@ -1,0 +1,10 @@
+import puppeteer from 'puppeteer-core';
+const [,, url, out, w, h, full] = process.argv;
+const b = await puppeteer.launch({ executablePath: process.env.CHROME, args: ['--no-sandbox','--force-color-profile=srgb'] });
+const p = await b.newPage();
+await p.setViewport({ width: +w, height: +h, deviceScaleFactor: 2 });
+await p.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }]);
+await p.goto(url, { waitUntil: 'networkidle2', timeout: 90000 });
+await new Promise(r => setTimeout(r, 2500));
+await p.screenshot({ path: out, fullPage: full === '1' });
+await b.close();

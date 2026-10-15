@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><script src="../assets/engine.js"></script>
+<style>
+  #mail { left: 40px; top: 60px; width: 1000px; height: 820px; padding: 50px 60px; }
+  #mail .to { font-family: Plex; font-size: 30px; color: #7a776f; }
+  #mail .to b { color: #333; font-weight: 500; }
+  #mail .subj { font-family: Garamond; font-size: 66px; line-height: 1.1; margin: 22px 0 26px; }
+  #mail hr { border: 0; border-top: 2px solid #ECEAE4; margin-bottom: 30px; }
+  #body { font-family: Inter; font-size: 38px; line-height: 1.55; white-space: pre-wrap; }
+  #body .hl { background: linear-gradient(var(--band), var(--band)) no-repeat; background-size: var(--w) 100%; border-radius: 6px; padding: 0 4px; margin: 0 -4px; }
+</style></head>
+<body>
+<div id="root" class="split" data-composition-id="r5" data-start="0" data-duration="5.666" data-width="1080" data-height="1920">
+  <svg class="defs"><filter id="mbf" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur id="mb" stdDeviation="0 0"/></filter></svg>
+  <div class="viewport" id="vp"><div class="world" id="world">
+    <div class="obj card doc" id="mail">
+      <div class="to">To <b>rortega@rosecitygrounds.com</b> · step 1 (cold)</div>
+      <div class="subj">Rose City and the map pack</div>
+      <hr>
+      <div id="body"></div>
+    </div>
+  </div></div>
+</div>
+<script type="application/json" id="events">[{"t":0.79,"t1":3.5,"type":"ticks"}]</script>
+<script>
+const $ = (id) => document.getElementById(id);
+const cam = E.path({ x: 540, y: 470, s: 1 }, [
+  { t0: 0, t1: 3.3, to: { x: 540, y: 490, s: 1.035 }, ease: 'sio' },          // glide while Claude writes
+  { t0: 3.38, t1: 4.98, to: { x: 540, y: 560, s: 1.2 }, ease: 'p2io' },      // push onto the specific detail
+]);
+const camera = E.camera({ world: $('world'), viewport: $('vp'), blurNode: $('mb'), fx: 540, fy: 470, cam });
+const A = 'Ruben — your site has ', H = 'no schema markup', B = ', which is most of why you\'re missing from the map pack across half your service area.\n\nHappy to send the specific pages. Want them?\n\n— Ethan';
+const FULL = A + H + B;
+function render(t) {
+  camera(t);
+  const s = E.typed(FULL, 0.79, 70, t);
+  const w = E.kf(t, [[3.6, 0], [4.0, 100, 'p2o']]);
+  let h = s.slice(0, A.length);
+  if (s.length > A.length) h += `<span class="hl" style="--w:${w}%">${s.slice(A.length, A.length + H.length)}</span>`;
+  if (s.length > A.length + H.length) h += s.slice(A.length + H.length);
+  $('body').innerHTML = h + E.caret(t, s.length < FULL.length || t < 4.2);
+}
+E.run('r5', 5.666, render);
+</script>
+</body></html>

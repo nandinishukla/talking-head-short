@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><script src="../assets/engine.js"></script>
+<style>
+  #logo { left: 105px; top: 640px; width: 230px; height: 230px; display: flex; align-items: center; justify-content: center; }
+  #logo img { width: 150px; height: 150px; }
+  #logoTxt { left: 370px; top: 700px; white-space: nowrap; }
+  #app { left: 50px; top: 1080px; width: 980px; height: 700px; border-radius: 40px; overflow: hidden; background: #FAF9F5; }
+  .bar { height: 76px; display: flex; align-items: center; padding: 0 30px; gap: 12px; border-bottom: 2px solid #ECEAE3; }
+  .tl { width: 18px; height: 18px; border-radius: 50%; }
+  .modes { margin-left: auto; margin-right: auto; display: flex; gap: 6px; background: #F0EEE6; border-radius: 16px; padding: 6px; font-family: Inter; font-size: 30px; }
+  .modes span { padding: 4px 26px; border-radius: 12px; color: #6b6a65; }
+  .modes .on { background: #fff; color: #111; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  .side { position: absolute; left: 0; top: 76px; bottom: 0; width: 96px; border-right: 2px solid #ECEAE3; background: #F5F4EE; display: flex; flex-direction: column; align-items: center; padding-top: 30px; gap: 30px; }
+  .side i { width: 40px; height: 40px; border-radius: 12px; background: #E3E1D9; display: block; }
+  .main { position: absolute; left: 96px; top: 76px; right: 0; bottom: 0; padding: 36px 40px; }
+  .ses { font-family: Inter; font-size: 30px; color: #6b6a65; margin-bottom: 26px; }
+  .ubub { margin-left: auto; width: fit-content; max-width: 640px; background: #F0EEE6; border-radius: 26px; padding: 18px 28px; font-family: Inter; font-size: 32px; }
+  .resp { margin-top: 34px; display: flex; gap: 22px; }
+  .resp img { width: 46px; height: 46px; margin-top: 4px; }
+  .lines { font-family: Plex; font-size: 30px; line-height: 1.75; letter-spacing: -0.03em; white-space: pre; }
+  .lines .hl { color: var(--clayText); }
+  .prompt { position: absolute; left: 40px; right: 40px; bottom: 34px; height: 92px; border-radius: 26px; background: #fff; border: 2px solid #E6E3DB; font-family: Inter; font-size: 30px; color: #9a988f; display: flex; align-items: center; padding: 0 28px; }
+</style></head>
+<body>
+<div id="root" class="split" data-composition-id="r1" data-start="0" data-duration="3.867" data-width="1080" data-height="1920">
+  <svg class="defs"><filter id="mbf" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur id="mb" stdDeviation="0 0"/></filter></svg>
+  <div class="viewport" id="vp"><div class="world" id="world">
+    <div class="obj card tile" id="logo"><img src="../assets/claude_logo.svg"></div>
+    <div class="obj h1" id="logoTxt">Claude Code</div>
+    <div class="obj card" id="app">
+      <div class="bar"><span class="tl" style="background:#FF5F57"></span><span class="tl" style="background:#FEBC2E"></span><span class="tl" style="background:#28C840"></span>
+        <div class="modes"><span>Chat</span><span class="on">Code</span></div></div>
+      <div class="side"><i></i><i></i><i></i><i></i></div>
+      <div class="main">
+        <div class="ses">harvey · ~/sales</div>
+        <div class="ubub">Set up Harvey and find me customers</div>
+        <div class="resp"><img src="../assets/claude_logo.svg"><div class="lines" id="lines"></div></div>
+        <div class="prompt">Reply to Claude…</div>
+      </div>
+    </div>
+  </div></div>
+</div>
+<script type="application/json" id="events">[{"t":1.75,"type":"pop"},{"t":1.95,"t1":3.6,"type":"ticks"}]</script>
+<script>
+const $ = (id) => document.getElementById(id);
+const cam = E.path({ x: 540, y: 470, s: 1 }, [
+  { t0: 0, t1: 1.31, to: { x: 540, y: 470, s: 1.025 }, ease: 'sio' },          // glide on the logo
+  { t0: 1.31, t1: 1.81, to: { x: 540, y: 1430, s: 1.0 }, ease: 'p3io' },        // step to the app ("agent")
+  { t0: 2.0, t1: 3.867, to: { x: 560, y: 1400, s: 1.16 }, ease: 'p2io' },       // push onto the streaming answer
+]);
+const camera = E.camera({ world: $('world'), viewport: $('vp'), blurNode: $('mb'), fx: 540, fy: 470, cam });
+const L = [
+  ['Harvey is online. ', 'Always Be Closing.', 1.95],
+  ['discover → ', '41 businesses in Portland, OR', 2.3],
+  ['scout    → ', '12 scored against your ICP', 2.72],
+  ['outbox   → ', '12 emails waiting for approval', 3.1],
+];
+function render(t) {
+  camera(t);
+  E.track($('logo'), t, { o: [[1.31, 1], [1.81, 0.4]], b: [[1.31, 0], [1.81, 9]] });
+  E.track($('logoTxt'), t, { o: [[1.31, 1], [1.81, 0.4]], b: [[1.31, 0], [1.81, 9]] });
+  E.track($('app'), t, E.land(1.45));
+  let html = '';
+  for (const [a, b, t0] of L) {
+    const full = a + b, s = E.typed(full, t0, 70, t);
+    if (!s) continue;
+    html += s.length <= a.length ? s : a + '<span class="hl">' + s.slice(a.length) + '</span>';
+    html += '\n';
+  }
+  $('lines').innerHTML = html;
+}
+E.run('r1', 3.867, render);
+</script>
+</body></html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><script src="../assets/engine.js"></script>
+<style>
+  #url { left: 90px; top: 385px; width: 900px; height: 170px; display: flex; align-items: center; gap: 26px; padding: 0 48px; font-family: Inter; font-size: 50px; }
+  #url .lock { width: 44px; height: 44px; }
+  #url .pre { color: #9a988f; }
+  #yaml { left: 80px; top: 1150px; width: 920px; height: 640px; padding: 44px 56px; }
+  #yaml .fn { font-family: Plex; font-size: 30px; color: #8a877f; display: flex; justify-content: space-between; border-bottom: 2px solid #EEECE6; padding-bottom: 22px; margin-bottom: 26px; }
+  #yaml .fn b { color: var(--clayText); font-weight: 500; }
+  #ylines { font-family: Plex; font-size: 38px; line-height: 1.85; white-space: pre; }
+  #ylines .k { color: var(--clayText); }
+  #ylines .ln { display: block; padding: 0 12px; margin: 0 -12px; }
+</style></head>
+<body>
+<div id="root" class="split" data-composition-id="r3" data-start="0" data-duration="5.933" data-width="1080" data-height="1920">
+  <svg class="defs"><filter id="mbf" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur id="mb" stdDeviation="0 0"/></filter></svg>
+  <div class="viewport" id="vp"><div class="world" id="world">
+    <div class="obj card doc" id="url">
+      <svg class="lock" viewBox="0 0 24 24" fill="none" stroke="#8a877f" stroke-width="2.2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+      <span><span class="pre">https://</span><span id="typed"></span></span>
+    </div>
+    <div class="obj card doc" id="yaml">
+      <div class="fn"><span>harvey.yaml</span><b id="status">learning from yoursite.com</b></div>
+      <div id="ylines"></div>
+    </div>
+  </div></div>
+</div>
+<script type="application/json" id="events">[{"t":0.3,"t1":1.15,"type":"keys","n":12},{"t":2.05,"type":"pop"},{"t":2.95,"t1":3.45,"type":"ticks"},{"t":3.72,"t1":4.05,"type":"ticks"},{"t":4.76,"t1":5.45,"type":"ticks"}]</script>
+<script>
+const $ = (id) => document.getElementById(id);
+const cam = E.path({ x: 540, y: 470, s: 1 }, [
+  { t0: 0, t1: 1.63, to: { x: 540, y: 470, s: 1.03 }, ease: 'sio' },          // glide while typing
+  { t0: 1.88, t1: 2.38, to: { x: 540, y: 1470, s: 1.0 }, ease: 'p3io' },       // step to the config ("trains")
+  { t0: 2.5, t1: 4.1, to: { x: 520, y: 1400, s: 1.17 }, ease: 'p2io' },        // push onto the lines being filled
+  { t0: 4.45, t1: 5.9, to: { x: 540, y: 1460, s: 1.02 }, ease: 'p2io' },       // pull back to the whole file
+]);
+const camera = E.camera({ world: $('world'), viewport: $('vp'), blurNode: $('mb'), fx: 540, fy: 470, cam });
+const LINES = [
+  ['product:', '', 2.95], ['  name: ', 'Your Startup', 3.05],
+  ['  pricing: ', '$49 / month', 3.72],
+  ['icp:', '', 4.76], ['  industries: ', '[landscaping, roofing]', 4.86], ['  geography: ', 'Portland, OR', 5.12],
+];
+function render(t) {
+  camera(t);
+  E.track($('url'), t, { o: [[1.88, 1], [2.38, 0.4]], b: [[1.88, 0], [2.38, 9]] });
+  $('typed').innerHTML = E.typed('yoursite.com', 0.3, 14, t) + E.caret(t, t < 1.88);
+  E.track($('yaml'), t, E.land(1.75));
+  let h = '';
+  // current line gets the highlight band
+  const cur = t >= 4.76 ? 3 : t >= 3.72 ? 2 : t >= 2.95 ? 0 : -1;
+  LINES.forEach(([k, v, t0], i) => {
+    const s = E.typed(k + v, t0, 55, t);
+    if (!s) return;
+    const on = (cur === 0 && i <= 1) || (cur === 2 && i === 2) || (cur === 3 && i >= 3);
+    const body = s.length <= k.length ? `<span class="k">${s}</span>` : `<span class="k">${k}</span>${s.slice(k.length)}`;
+    h += `<span class="ln" style="background:${on ? 'var(--band)' : 'transparent'};border-radius:10px">${body}</span>`;
+  });
+  $('ylines').innerHTML = h;
+
+}
+E.run('r3', 5.933, render);
+</script>
+</body></html>

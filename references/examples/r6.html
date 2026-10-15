@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><script src="../assets/engine.js"></script>
+<style>
+  .page { position: absolute; left: 0; top: 128px; width: 1032px; padding: 40px 44px; }
+  .title { font-family: Garamond; font-size: 92px; line-height: 1.1; }
+  .who { font-family: Plex; font-size: 30px; color: #6d6a63; margin: 10px 0 34px; }
+  .msg { position: relative; border-radius: 28px; padding: 30px 36px; font-family: Inter; font-size: 40px; line-height: 1.45; max-width: 820px; }
+  .in { background: #fff; border: 2px solid #E6E3DE; }
+  .out { background: #fff; border: 2px solid #E6E3DE; margin-left: auto; margin-top: 30px; }
+  .meta { font-family: Plex; font-size: 30px; color: #6d6a63; margin-bottom: 8px; }
+  .intent { display: inline-block; font-family: Plex; font-size: 30px; color: var(--clayText); background: var(--band); border-radius: 10px; padding: 2px 14px; margin-top: 16px; }
+  #rtext .rd { background: linear-gradient(var(--band), var(--band)) no-repeat; background-size: var(--w) 100%; }
+  #booked { margin-top: 40px; display: flex; align-items: center; gap: 20px; font-family: Inter; font-size: 36px; font-weight: 600; background: #fff; border: 2px solid #E6E3DE; border-radius: 28px; padding: 24px 30px; width: fit-content; }
+  #booked .ck { width: 52px; height: 52px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; }
+  #booked span.t { font-family: Plex; font-weight: 400; color: #6d6a63; font-size: 30px; }
+</style></head>
+<body>
+<div id="root" data-composition-id="r6" data-start="0" data-duration="7.684" data-width="1080" data-height="1920">
+  <svg class="defs"><filter id="mbf" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur id="mb" stdDeviation="0 0"/></filter></svg>
+  <div class="pw"><div class="inner" id="inner">
+    <div class="hv-head"><div class="hv-mark">H</div><div><div class="hv-name">Harvey</div><div class="hv-tag">Always Be Closing</div></div><div class="hv-status"><span class="dot"></span>running</div></div>
+    <div class="page">
+      <div class="title">Conversations</div>
+      <div class="who">rortega@rosecitygrounds.com</div>
+      <div class="msg in" id="inMsg"><div class="meta">Ruben · reply</div><div id="rtext"><span class="rd">Thanks, but we already pay an agency for our website.</span></div><div class="intent" id="intent"></div></div>
+      <div class="msg out" id="outMsg"><div class="meta">Harvey · draft</div><div id="otext"></div></div>
+      <div id="booked"><div class="ck"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><div>Meeting booked <span class="t">Thu · 10:00 AM</span></div></div>
+    </div>
+  </div></div>
+</div>
+<script type="application/json" id="events">[{"t":0.5,"type":"pop"},{"t":4.2,"t1":4.5,"type":"ticks"},{"t":5.09,"t1":6.6,"type":"ticks"},{"t":7.27,"type":"chime"}]</script>
+<script>
+const $ = (id) => document.getElementById(id);
+const inner = (t) => E.kf(t, [[0, { x: 516, y: 480, s: 1.08 }], [4.84, { x: 516, y: 480, s: 1.08 }], [5.44, { x: 516, y: 700, s: 1.08 }, 'p2io'], [6.62, { x: 516, y: 700, s: 1.08 }], [7.22, { x: 516, y: 560, s: 1.0 }, 'p2io']]);
+const mbNode = $('mb'), K = 0.29 * 0.75 / 60;
+const OUT = 'Fair — keep the agency. I\'ll send the three pages it missed so they can fix them. Worth 15 minutes Thursday?';
+function render(t) {
+  const c = inner(t), p = inner(Math.max(0, t - 1 / 240)), n = inner(t + 1 / 240);
+  const el = $('inner');
+  el.style.transform = `translate(${516 - c.x * c.s}px,${520 - c.y * c.s}px) scale(${c.s})`;
+  const vx = Math.abs((n.x * n.s - p.x * p.s) * 120), vy = Math.abs((n.y * n.s - p.y * p.s) * 120), zs = Math.abs(n.s - p.s) * 120 / c.s * 420;
+  const bx = Math.min(40, K * (vx + zs)), by = Math.min(40, K * (vy + zs));
+  if ((bx < 0.3 && by < 0.3) || t < 1e-6) el.style.filter = 'none'; else { mbNode.setAttribute('stdDeviation', `${bx} ${by}`); el.style.filter = 'url(#mbf)'; }
+  E.track($('inMsg'), t, E.land(0.2));
+  // Harvey "reads" the reply: a band sweeps across it
+  $('rtext').firstChild.style.setProperty('--w', E.kf(t, [[1.2, 0], [2.0, 100, 'sio'], [2.4, 100], [2.7, 0]]) + '%');
+  $('intent').textContent = E.typed('intent: objection', 4.2, 60, t);
+  $('intent').style.display = t >= 4.2 ? 'inline-block' : 'none';
+  E.track($('outMsg'), t, { o: [[4.95, 0], [5.15, 1]] });
+  $('otext').innerHTML = E.typed(OUT, 5.09, 75, t) + E.caret(t, t >= 5.09 && t < 6.7);
+  E.track($('booked'), t, { o: [[7.0, 0], [7.25, 1, 'p3o']], y: [[7.0, 30], [7.35, 0, 'p3o']], s: [[7.0, 0.94], [7.35, 1, 'p3o']] });
+}
+E.run('r6', 7.684, render);
+</script>
+</body></html>

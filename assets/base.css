@@ -1,0 +1,42 @@
+@font-face { font-family: Poppins; src: url(fonts/Poppins-Regular.ttf); font-weight: 400; }
+@font-face { font-family: Poppins; src: url(fonts/Poppins-SemiBold.ttf); font-weight: 600; }
+@font-face { font-family: Poppins; src: url(fonts/Poppins-Bold.ttf); font-weight: 700; }
+@font-face { font-family: Garamond; src: url(fonts/EBGaramond.ttf); font-weight: 400 800; }
+@font-face { font-family: Garamond; src: url(fonts/EBGaramond-Italic.ttf); font-style: italic; font-weight: 400 800; }
+@font-face { font-family: Plex; src: url(fonts/IBMPlexMono-Regular.ttf); font-weight: 400; }
+@font-face { font-family: Plex; src: url(fonts/IBMPlexMono-Medium.ttf); font-weight: 500; }
+@font-face { font-family: Inter; src: url(fonts/Inter.ttf); font-weight: 100 900; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #F3F3F0; }
+:root {
+  --ink: #111111; --clay: #D97757; --clayText: #B25730; --band: #FBEEE8; --green: #34C759; --red: #FF3B30;
+  --shadow: 0 60px 120px rgba(24,24,32,.16), 0 24px 48px rgba(24,24,32,.10), 0 4px 10px rgba(24,24,32,.06);
+}
+#root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: Poppins, sans-serif; color: var(--ink);
+  background: radial-gradient(ellipse farthest-corner at 50% 36%, #FFFFFF 0%, #F3F3F0 100%); }
+.viewport { position: absolute; inset: 0; }
+.split .viewport { -webkit-mask-image: linear-gradient(to bottom, #000 900px, transparent 1060px); mask-image: linear-gradient(to bottom, #000 900px, transparent 1060px); }
+.world { position: absolute; left: 0; top: 0; width: 1px; height: 1px; transform-origin: 0 0; }
+.obj { position: absolute; transform-origin: 50% 50%; will-change: transform, opacity, filter; }
+.card { background: #fff; box-shadow: var(--shadow); }
+.doc { border-radius: 40px; }
+.tile { border-radius: 72px; }
+.h1 { font-size: 96px; font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; }
+.h2 { font-size: 52px; font-weight: 700; line-height: 1.15; }
+.body { font-size: 30px; font-weight: 400; line-height: 1.45; }
+.mono { font-family: Plex, monospace; }
+.caret { display: inline-block; width: 4px; height: 1em; background: var(--clay); vertical-align: -0.12em; margin-left: 3px; }
+.caret.off { background: transparent; }
+.band { background: linear-gradient(var(--band), var(--band)) no-repeat; background-size: var(--w, 0%) 100%; border-radius: 8px; }
+svg.defs { position: absolute; width: 0; height: 0; }
+/* product window chrome (Harvey dashboard, rebuilt from the repo's dashboard capture) */
+.pw { position: absolute; left: 24px; top: 190px; width: 1032px; height: 1040px; border-radius: 36px; background: #F8F7F6; box-shadow: var(--shadow); overflow: hidden; }
+.pw .inner { position: absolute; left: 0; top: 0; width: 1032px; height: 1040px; transform-origin: 0 0; }
+.hv-head { position: absolute; left: 0; top: 0; width: 1032px; height: 128px; border-bottom: 2px solid #E6E3DE; display: flex; align-items: center; padding: 0 44px; gap: 22px; background: #F8F7F6; z-index: 5; }
+.hv-mark { width: 64px; height: 64px; background: #1A1A1A; color: #fff; font-family: Garamond; font-size: 46px; display: flex; align-items: center; justify-content: center; border-radius: 4px; }
+.hv-name { font-family: Garamond; font-size: 46px; line-height: 1; }
+.hv-tag { font-family: Garamond; font-style: italic; font-size: 30px; color: #555; }
+.hv-status { margin-left: auto; font-family: Plex; font-size: 30px; color: #333; display: flex; align-items: center; gap: 12px; }
+.dot { width: 16px; height: 16px; border-radius: 50%; background: var(--green); }
+.serif { font-family: Garamond; }
+.ui { font-family: Inter; }

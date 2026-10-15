@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><script src="../assets/engine.js"></script>
+<style>
+  .page { position: absolute; left: 0; top: 128px; width: 1032px; padding: 40px 70px; }
+  .title { font-family: Garamond; font-size: 92px; line-height: 1.1; }
+  .plan { font-family: Plex; font-size: 30px; color: #6d6a63; margin-top: 8px; }
+  .big { font-family: Garamond; font-size: 210px; line-height: 1; margin-top: 80px; }
+  .big small { font-family: Inter; font-size: 36px; color: #6d6a63; margin-left: 16px; }
+  .meter { position: relative; margin-top: 170px; height: 72px; border-radius: 32px; background: #ECE9E3; }
+  .meter .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 32px; background: var(--clay); }
+  .meter .room { position: absolute; top: 0; bottom: 0; left: 80%; right: 0; border-radius: 0 32px 32px 0; background: rgba(52,199,89,.22); }
+  .meter .cap { position: absolute; left: 80%; top: -76px; bottom: -14px; width: 4px; background: #111; }
+  .meter .capl { position: absolute; left: calc(80% - 150px); top: -80px; font-family: Plex; font-size: 30px; }
+  .roomt { margin-top: 60px; margin-left: 50%; font-family: Inter; font-size: 34px; text-align: right; }
+  .roomt b { color: #1E8E3E; }
+  .cfg { margin-top: 120px; font-family: Plex; font-size: 30px; color: #6d6a63; }
+  .cfg b { color: var(--clayText); font-weight: 500; }
+</style></head>
+<body>
+<div id="root" data-composition-id="r9" data-start="0" data-duration="4.184" data-width="1080" data-height="1920">
+  <svg class="defs"><filter id="mbf" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur id="mb" stdDeviation="0 0"/></filter></svg>
+  <div class="pw"><div class="inner" id="inner">
+    <div class="hv-head"><div class="hv-mark">H</div><div><div class="hv-name">Harvey</div><div class="hv-tag">Always Be Closing</div></div><div class="hv-status"><span class="dot"></span>running</div></div>
+    <div class="page">
+      <div class="title">Usage</div>
+      <div class="plan">Claude Max · today's quota</div>
+      <div class="big"><span id="pct">0%</span><small>used by Harvey</small></div>
+      <div class="meter"><div class="room" id="room"></div><div class="fill" id="fill"></div><div class="cap"></div><div class="capl">cap 80%</div></div>
+      <div class="roomt" id="roomt"><b>20%</b> left for your own work</div>
+      <div class="cfg">max_daily_claude_percent: <b>80</b></div>
+    </div>
+  </div></div>
+</div>
+<script type="application/json" id="events">[]</script>
+<script>
+const $ = (id) => document.getElementById(id);
+const inner = (t) => E.kf(t, [[0, { x: 516, y: 520, s: 1 }], [2.36, { x: 516, y: 520, s: 1 }], [2.96, { x: 516, y: 760, s: 1.15 }, 'p2io']]);
+const mbNode = $('mb'), K = 0.29 * 0.75 / 60;
+function render(t) {
+  const c = inner(t), p = inner(Math.max(0, t - 1 / 240)), n = inner(t + 1 / 240);
+  const el = $('inner');
+  el.style.transform = `translate(${516 - c.x * c.s}px,${520 - c.y * c.s}px) scale(${c.s})`;
+  const vx = Math.abs((n.x * n.s - p.x * p.s) * 120), vy = Math.abs((n.y * n.s - p.y * p.s) * 120), zs = Math.abs(n.s - p.s) * 120 / c.s * 420;
+  const bx = Math.min(40, K * (vx + zs)), by = Math.min(40, K * (vy + zs));
+  if ((bx < 0.3 && by < 0.3) || t < 1e-6) el.style.filter = 'none'; else { mbNode.setAttribute('stdDeviation', `${bx} ${by}`); el.style.filter = 'url(#mbf)'; }
+  const u = E.kf(t, [[0.2, 0], [1.45, 62, 'p2io']]);
+  $('fill').style.width = u + '%';
+  $('pct').textContent = Math.round(u) + '%';
+  const r = E.kf(t, [[2.6, 0], [3.0, 1, 'p2o']]);
+  $('room').style.opacity = r; $('roomt').style.opacity = r;
+}
+E.run('r9', 4.184, render);
+</script>
+</body></html>

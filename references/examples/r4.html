@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><script src="../assets/engine.js"></script>
+<style>
+  .page { position: absolute; left: 0; top: 128px; width: 1032px; padding: 40px 44px; }
+  .title { font-family: Garamond; font-size: 92px; line-height: 1.1; }
+  .sub { font-family: Plex; font-size: 30px; color: #6d6a63; margin-top: 8px; height: 44px; }
+  .rows { margin-top: 44px; border-top: 2px solid #1f1f1f; }
+  .row { position: relative; border-bottom: 2px solid #E6E3DE; padding: 34px 6px; overflow: hidden; }
+  .row .n { font-family: Inter; font-size: 40px; font-weight: 600; }
+  .row .c { font-family: Plex; font-size: 30px; color: #6d6a63; margin-top: 4px; }
+  .row .obs { font-family: Plex; font-size: 32px; line-height: 1.7; color: #2a2a2a; margin-top: 10px; white-space: pre; }
+  .row .obs i { font-style: normal; color: var(--clayText); }
+  .score { position: absolute; right: 6px; top: 44px; display: flex; align-items: center; gap: 16px; }
+  .score .bar { width: 150px; height: 18px; border-radius: 9px; background: #ECE9E3; overflow: hidden; }
+  .score .bar b { display: block; height: 100%; background: var(--clay); border-radius: 9px; }
+  .score .v { font-family: Plex; font-weight: 500; font-size: 36px; width: 96px; text-align: right; }
+</style></head>
+<body>
+<div id="root" data-composition-id="r4" data-start="0" data-duration="5.384" data-width="1080" data-height="1920">
+  <svg class="defs"><filter id="mbf" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur id="mb" stdDeviation="0 0"/></filter></svg>
+  <div class="pw"><div class="inner" id="inner">
+    <div class="hv-head"><div class="hv-mark">H</div><div><div class="hv-name">Harvey</div><div class="hv-tag">Always Be Closing</div></div><div class="hv-status"><span class="dot"></span>running</div></div>
+    <div class="page">
+      <div class="title">Companies</div>
+      <div class="sub" id="sub"></div>
+      <div class="rows" id="rows"></div>
+    </div>
+  </div></div>
+</div>
+<script type="application/json" id="events">[{"t":1.26,"t1":1.95,"type":"ticks"},{"t":2.62,"t1":3.4,"type":"ticks"},{"t":3.72,"t1":4.3,"type":"ticks"}]</script>
+<script>
+const $ = (id) => document.getElementById(id);
+const CO = [
+  ['Cascade Landscaping', 'cascadelandscaping.com', 9, ['no online booking', 'running Google Ads', 'after-hours calls → voicemail']],
+  ['Rose City Grounds', 'rosecitygrounds.com', 8],
+  ['Alder Creek Landscape', 'aldercreeklandscape.com', 7],
+  ['Bridgetown Yard', 'bridgetownyard.com', 6],
+];
+const rowsEl = $('rows');
+CO.forEach((c, i) => {
+  const r = document.createElement('div'); r.className = 'row'; r.id = 'row' + i;
+  r.innerHTML = `<div class="n">${c[0]}</div><div class="c">${c[1]} · Portland, OR</div>${i === 0 ? '<div class="obs" id="obs"></div>' : ''}
+    <div class="score" id="sc${i}"><div class="bar"><b id="sb${i}"></b></div><div class="v" id="sv${i}"></div></div>`;
+  rowsEl.appendChild(r);
+});
+// only the camera INSIDE the product window moves (world camera holds still)
+const inner = (t) => E.kf(t, [[0, { x: 516, y: 520, s: 1 }], [2.32, { x: 516, y: 520, s: 1 }], [2.92, { x: 420, y: 520, s: 1.3 }, 'p2io'], [3.42, { x: 420, y: 520, s: 1.3 }], [4.02, { x: 516, y: 600, s: 0.93 }, 'p2io']]);
+const mbNode = $('mb'), K = 0.29 * 0.75 / 60;
+function render(t) {
+  const c = inner(t), p = inner(Math.max(0, t - 1 / 240)), n = inner(t + 1 / 240);
+  const el = $('inner');
+  el.style.transform = `translate(${516 - c.x * c.s}px,${520 - c.y * c.s}px) scale(${c.s})`;
+  const vx = Math.abs((n.x * n.s - p.x * p.s) / (2 / 240)), vy = Math.abs((n.y * n.s - p.y * p.s) / (2 / 240)), zs = Math.abs(n.s - p.s) / (2 / 240) / c.s * 420;
+  const bx = Math.min(40, K * (vx + zs)), by = Math.min(40, K * (vy + zs));
+  if (bx < 0.3 && by < 0.3 || t < 1e-6) el.style.filter = 'none'; else { mbNode.setAttribute('stdDeviation', `${bx} ${by}`); el.style.filter = 'url(#mbf)'; }
+  $('sub').textContent = E.typed('41 businesses in Portland, OR', 1.26, 50, t);
+  CO.forEach((co, i) => {
+    const r = $('row' + i), t0 = 1.32 + i * 0.13;
+    E.track(r, t, { o: [[t0, 0], [t0 + 0.25, 1, 'p3o']], y: [[t0, 24], [t0 + 0.35, 0, 'p3o']] });
+    // neighbours dim/blur while the camera pushes onto row 0
+    if (i > 0) { const d = E.kf(t, [[2.32, 0], [2.92, 1], [3.42, 1], [4.02, 0]]); r.style.filter = d > 0.01 ? `blur(${(14 * d).toFixed(2)}px)` : 'none'; r.style.opacity = (Math.min(1, E.kf(t, [[t0, 0], [t0 + 0.25, 1, 'p3o']])) * (1 - 0.3 * d)).toFixed(3); }
+    const s0 = 3.72 + i * 0.14, sc = E.kf(t, [[s0, 0], [s0 + 0.45, co[2], 'p3o']]);
+    $('sc' + i).style.opacity = E.kf(t, [[s0, 0], [s0 + 0.15, 1]]);
+    $('sb' + i).style.width = (sc * 10) + '%';
+    $('sv' + i).textContent = Math.round(sc) + '/10';
+  });
+  const o = CO[0][3].map((s, j) => E.typed('· ' + s, 2.62 + j * 0.26, 60, t)).filter(Boolean);
+  $('obs').innerHTML = o.join('\n');
+}
+E.run('r4', 5.384, render);
+</script>
+</body></html>

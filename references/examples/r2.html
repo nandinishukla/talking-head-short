@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><script src="../assets/engine.js"></script>
+<style>
+  #mark { left: 430px; top: 330px; width: 220px; height: 220px; background: #1A1A1A; border-radius: 10px; color: #fff; font-family: Garamond; font-size: 170px; line-height: 220px; text-align: center; box-shadow: var(--shadow); }
+  #name { left: 0; top: 590px; width: 1080px; text-align: center; font-family: Garamond; font-size: 170px; line-height: 1; }
+  #tag { left: 0; top: 790px; width: 1080px; text-align: center; font-family: Garamond; font-style: italic; font-size: 64px; color: #444; }
+  /* real capture: fixed frame on a washed, blurred clone of itself */
+  #cap { left: 1633px; top: 0; width: 1080px; height: 1920px; }
+  #wash { position: absolute; inset: -200px; overflow: hidden; }
+  #wash img { position: absolute; left: 0; top: 0; transform-origin: 0 0; filter: blur(40px) saturate(.7) brightness(1.05); }
+  #wash::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,.72); }
+  #frame { position: absolute; left: 24px; top: 190px; width: 1032px; height: 1040px; border-radius: 36px; background: #fff; box-shadow: var(--shadow); overflow: hidden; }
+  #frame .ft { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  #mit { position: absolute; background: var(--band); mix-blend-mode: multiply; border-radius: 10px; }
+</style></head>
+<body>
+<div id="root" data-composition-id="r2" data-start="0" data-duration="5.633" data-width="1080" data-height="1920">
+  <svg class="defs"><filter id="mbf" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur id="mb" stdDeviation="0 0"/></filter></svg>
+  <div class="viewport" id="vp"><div class="world" id="world">
+    <div class="obj" id="mark">H</div>
+    <div class="obj" id="name">Harvey</div>
+    <div class="obj" id="tag">Always Be Closing</div>
+    <div class="obj" id="cap">
+      <div id="wash"><img id="washImg" src="../assets/gh.png"></div>
+      <div id="frame"><div class="ft" id="ft"><img src="../assets/gh.png"><div id="mit"></div></div></div>
+    </div>
+  </div></div>
+</div>
+<script type="application/json" id="events">[{"t":3.75,"type":"whoosh"}]</script>
+<script>
+const $ = (id) => document.getElementById(id);
+// world camera: glide on the lockup, ONE whip (0.45 s out power3.in, 0.6 s in power3.out), then holds still
+const cam = E.path({ x: 540, y: 715, s: 1 }, [
+  { t0: 0, t1: 3.30, to: { x: 540, y: 715, s: 1.035 }, ease: 'sio' },
+  { t0: 3.30, t1: 3.75, to: { x: 1240, y: 715, s: 1.035 }, ease: 'p3i' },
+  { t0: 3.75, t1: 4.35, to: { x: 2173, y: 715, s: 1.0 }, ease: 'p3o' },
+]);
+const camera = E.camera({ world: $('world'), viewport: $('vp'), blurNode: $('mb'), fx: 540, fy: 715, cam });
+// footage camera inside the fixed frame (image px of the 2x capture): centre + scale
+const foot = (t) => E.kf(t, [[0, { cx: 2205, cy: 680, s: 1.64 }], [4.68, { cx: 2205, cy: 680, s: 1.64 }], [5.28, { cx: 2150, cy: 1000, s: 2.13 }, 'p2io']]);
+function render(t) {
+  const { c } = camera(t);
+  const f = foot(t);
+  const tx = 516 - f.cx * f.s, ty = 520 - f.cy * f.s;
+  $('ft').style.transform = `translate(${tx}px,${ty}px) scale(${f.s / 2 * 2})`;
+  $('ft').querySelector('img').style.width = '2560px';
+  // washed clone follows the footage, enlarged 1.2x around the frame centre
+  const ws = f.s * 1.2, wx = 200 + 540 - f.cx * ws, wy = 200 + 710 - f.cy * ws;
+  $('washImg').style.transform = `translate(${wx}px,${wy}px) scale(${ws})`;
+  // highlight band behind "MIT license" (About sidebar) once the push lands
+  const bw = E.kf(t, [[5.0, 0], [5.35, 1, 'p2o']]);
+  const m = $('mit'); m.style.left = '1945px'; m.style.top = '1062px'; m.style.height = '62px'; m.style.width = (330 * bw) + 'px';
+}
+E.run('r2', 5.633, render);
+</script>
+</body></html>
