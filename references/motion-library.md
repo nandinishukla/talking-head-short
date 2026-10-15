@@ -57,3 +57,25 @@ Sources to browse (by hand, as a viewer):
 - Borrow: name the concept in one line first (for example "ink becomes type becomes architecture"). Then make every shot out of the previous one: shapes, type and colour transform into the next scene, with no cuts or fades. Show range in equal shares: kinetic type, shape morphing, a 2D-to-3D moment, a data/UI moment and an end title. Keep one typeface, at most three colours plus black and white, and one consistent camera language. Something changes on every beat (120 BPM), the strongest moment lands in the last full bar, and the final frame matches the first so the piece loops.
 - Avoid: particle bursts, glows, lens flares, camera shake, RGB split, crossfades, generic gradients, bouncy easing, holds over half a second, template looks. In a short, use its transform-don't-cut idea between graphic beats *inside* a run. Picture cuts between layouts stay hard cuts, and the house rules in `brief.md` win.
 - Full prompt: private, in `motion-prompts.md` (not in this repo).
+
+### launch-film-one-take-glass
+- Link: prompt-motion.com (entry link and creator still to add)
+- Creator: see the prompt-motion.com entry
+- Tags: product-ui, phone, kinetic-type, photos, music
+- Borrow: a keynote-style launch film in **one continuous 2D take**. Nothing fades, blurs or cuts; objects change shape instead:
+  - text rises out of a mask line, icons pop from zero on a spring, and bars draw across;
+  - pages push, and a black shape floods the whole frame, then contracts into the next scene;
+  - one black shape keeps morphing through states (ordered ✓ → printing % → on its way → delivered ✓);
+  - an iris of six blades closes over one scene and snaps open on the next;
+  - a grid unfolds from behind a tile like a paper map, then reflows into a bento.
+  - The surfaces are warm off-white with black UI and iOS-style liquid glass. The glass is built by cloning the scene behind it through a displacement map, with slight chromatic edges and a rim light.
+  - A cursor drives every change with real clicks, drags and long-presses, and the camera zooms screen-studio style so the cursor scales with it.
+  - The music structure sets the beats: the zoom lands on the drop and the quiet part sits in the breakdown.
+- Technique notes worth reusing:
+  - springs as closed-form step responses, summed per target so they stay a pure function of time;
+  - a flood must overscale past the corners and take about 0.3 s;
+  - text swapping inside a morphing shape needs its own mask;
+  - footage goes in all-intra (`-g 1`), loaded as a blob URL;
+  - scan the render for single-frame pops (frame-difference spikes about 3× their neighbours).
+- Avoid: crossfades, blur-ins, "developing" brightness, 3D flips, particles, glows, holds over 1 s, template looks. Its sound rule (downloaded SFX) conflicts with the house rule (everything synthesized in code), so the house wins. In a short, use its flood/iris/morphing-shape transitions *inside* a graphic run (for example an order/status sequence as one morphing shape); layout changes stay hard cuts; format is 9:16 and the house rules in `brief.md` win.
+- Full prompt: private, in `motion-prompts.md` (not in this repo).
