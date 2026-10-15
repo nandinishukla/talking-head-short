@@ -4,10 +4,28 @@ Full prompt texts collected by hand from [prompt-motion.com](https://prompt-moti
 
 Each block matches an id in `motion-library.md`, which summarises what to borrow. The skill reads a block when the storyboard cites its id. These prompts were written for standalone product videos (mostly 16:9). Take their motion ideas and rules, and keep the house format (9:16, layouts, captions, levels) from `brief.md`.
 
+
+## Credits
+
+The prompts in this file come from these prompt-motion.com entries (creator handle from each entry's URL):
+
+| Creator | Entry |
+|---|---|
+| @wozu-co | https://prompt-motion.com/customize/wozu-co-242285 |
+| @elliot-garreffa | https://prompt-motion.com/customize/elliot-garreffa-f334bc |
+| @bizibeast | https://prompt-motion.com/customize/bizibeast-10f264 |
+| @adamdesgns | https://prompt-motion.com/customize/adamdesgns-478d6d |
+| @devius-maximus | https://prompt-motion.com/customize/devius-maximus-beab45 |
+| @fractadev | https://prompt-motion.com/customize/fractadev-149adc |
+| @miskinho | https://prompt-motion.com/customize/miskinho-443898 |
+| @gautam-mer1 | https://prompt-motion.com/customize/gautam-mer1-2ae354 |
+
+Which entry each block below came from is still to be matched; until then each block's "Source" line points here.
+
 ---
 
 ## product-showreel-throughline
-- Source: prompt-motion.com (creator / entry link: not given yet; add it)
+- Source: prompt-motion.com (creator: see Credits at the top; exact entry to be matched)
 - Added: 2026-10-14
 
 ```text
@@ -51,7 +69,7 @@ Show me what you found, the through-line object and a beat-by-beat storyboard, t
 ---
 
 ## gallery-3d-film-camera
-- Source: prompt-motion.com (creator / entry link: not given yet; add it)
+- Source: prompt-motion.com (creator: see Credits at the top; exact entry to be matched)
 - Added: 2026-10-14
 
 ```text
@@ -90,7 +108,7 @@ Describe the signature shot and the shot list in a few lines, then build it with
 ---
 
 ## showreel-everything-transforms
-- Source: prompt-motion.com (creator / entry link: not given yet; add it)
+- Source: prompt-motion.com (creator: see Credits at the top; exact entry to be matched)
 - Added: 2026-10-14
 
 ```text
@@ -123,7 +141,7 @@ Tell me the concept and show a beat-by-beat storyboard, then build it without as
 ---
 
 ## launch-film-one-take-glass
-- Source: prompt-motion.com (creator / entry link: not given yet; add it)
+- Source: prompt-motion.com (creator: see Credits at the top; exact entry to be matched)
 - Added: 2026-10-14
 
 ```text
@@ -170,7 +188,7 @@ Ask me for the inputs, then show me the beat map and 4 stills (open, glass, stag
 ---
 
 ## product-sting-frame-exact
-- Source: prompt-motion.com (creator / entry link: not given yet; add it)
+- Source: prompt-motion.com (creator: see Credits at the top; exact entry to be matched)
 - Added: 2026-10-14
 
 ```text
@@ -219,7 +237,7 @@ Ask me for the inputs. Then show me 4 stills (f40 header in the window, f86 icon
 ---
 
 ## product-showreel-throughline (variant: 30 s + reference video)
-- Source: prompt-motion.com (creator / entry link: not given yet; add it)
+- Source: prompt-motion.com (creator: see Credits at the top; exact entry to be matched)
 - Added: 2026-10-14
 - Differs from the base block: 30 s instead of 15 s; takes its visual style from a reference video the user supplies; "above all, it should be very cool".
 
@@ -265,7 +283,7 @@ Show me what you found, the through-line object and a beat-by-beat storyboard, t
 ---
 
 ## product-showreel-throughline (variant: 40 s product film)
-- Source: prompt-motion.com (creator / entry link: not given yet; add it)
+- Source: prompt-motion.com (creator: see Credits at the top; exact entry to be matched)
 - Added: 2026-10-14
 - Differs from the base block: a 40 s "product film" instead of a 15 s showreel; otherwise the same rules.
 
@@ -311,7 +329,7 @@ Show me what you found, the through-line object and a beat-by-beat storyboard, t
 ---
 
 ## product-showreel-throughline (variant: 30 s explainer, any product)
-- Source: prompt-motion.com (creator / entry link: not given yet; add it)
+- Source: prompt-motion.com (creator: see Credits at the top; exact entry to be matched)
 - Added: 2026-10-14
 - Differs from the base block: a 30 s explainer for any product (link supplied by the user); asks for "a strong script, good colors and good music: the kind of video people watch more than once".
 
@@ -357,7 +375,7 @@ Show me what you found, the through-line object and a beat-by-beat storyboard, t
 ---
 
 ## product-showreel-throughline (variant: 15 s launch video, supasito.com)
-- Source: prompt-motion.com (creator / entry link: not given yet; add it)
+- Source: prompt-motion.com (creator: see Credits at the top; exact entry to be matched)
 - Added: 2026-10-14
 - Identical to the base block except the first line of <direction>, which reads:
   "A 15-second launch video for supasito.com. Research it first: what it does, who it's for, its real interface and its brand. Use what you find; never invent screens, features or numbers."
@@ -366,7 +384,7 @@ Show me what you found, the through-line object and a beat-by-beat storyboard, t
 ---
 
 ## product-showreel-throughline (variant: 15 s, built from this project's codebase)
-- Source: prompt-motion.com (creator / entry link: not given yet; add it)
+- Source: prompt-motion.com (creator: see Credits at the top; exact entry to be matched)
 - Added: 2026-10-14
 - Identical to the base block except the first lines of <direction>, which read:
   "A 15-second showreel for this project. Read the codebase first: what it does, its real screens and components, its colors and type. Build the scenes from the real UI; never invent features."
@@ -374,21 +392,21 @@ Show me what you found, the through-line object and a beat-by-beat storyboard, t
 ---
 
 ## product-showreel-throughline (variant: 40 s product film, Bento.surf)
-- Source: prompt-motion.com (creator / entry link: not given yet; add it)
+- Source: prompt-motion.com (creator: see Credits at the top; exact entry to be matched)
 - Added: 2026-10-14
 - Identical to the 40 s product-film variant (Distilbook) except the product: "A 40-second product film for Bento.surf. Research it first: ..."
 
 ---
 
 ## product-showreel-throughline (variant: 15 s showreel, dubz up)
-- Source: prompt-motion.com (creator / entry link: not given yet; add it)
+- Source: prompt-motion.com (creator: see Credits at the top; exact entry to be matched)
 - Added: 2026-10-14
 - Identical to the base block except the product line: "A 15-second showreel for our project, dubz up. Research it first: ..."
 
 ---
 
 ## product-showreel-throughline (variant: 30 s high-end SaaS launch film, from the codebase)
-- Source: prompt-motion.com (creator / entry link: not given yet; add it)
+- Source: prompt-motion.com (creator: see Credits at the top; exact entry to be matched)
 - Added: 2026-10-14
 - Identical to the base block except two lines of <direction>:
   - "A 30-second high-end launch film for my SaaS. Read the codebase first: what it does, its real screens and components, its colors and type. Build the scenes from the real UI; never invent features."
@@ -397,14 +415,14 @@ Show me what you found, the through-line object and a beat-by-beat storyboard, t
 ---
 
 ## product-showreel-throughline (variant: 15 s showreel, Quetzal)
-- Source: prompt-motion.com (creator / entry link: not given yet; add it)
+- Source: prompt-motion.com (creator: see Credits at the top; exact entry to be matched)
 - Added: 2026-10-14
 - Identical to the base block except the product line: "A 15-second showreel for Quetzal. Research it first: ..."
 
 ---
 
 ## product-showreel-throughline (variant: 30 s Apple-style app film, VERTICAL 1080x1920, from the codebase)
-- Source: prompt-motion.com (creator / entry link: not given yet; add it)
+- Source: prompt-motion.com (creator: see Credits at the top; exact entry to be matched)
 - Added: 2026-10-14
 - Identical to the base block except three lines:
   - <direction> line 1: "A 30-second Apple-style film for my app. Read the codebase first: what it does, its real screens and components, its colors and type. Build the scenes from the real UI; never invent features."
