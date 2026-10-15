@@ -59,4 +59,5 @@ These are the things that actually went wrong or cost time on the first short. E
 ## Audio
 - A -14 LUFS talking voice peaks around +0.3 dBTP, so the master always needs the true-peak limiter. That's expected; report the max reduction (about 2 dB).
 - Put the whoosh by its **measured** loudest sample, not the envelope centre: band-pass filtering shifted the peak 40 ms early.
+- Measure loudness on the delivered MP4, not just the WAV: AAC encoding overshot a −1.3 dBTP master to −0.7 dBTP. The limiter ceiling is now −1.8 dBTP, which lands the MP4 at about −1.3.
 - Never overwrite `final_master.wav` while an assembly is reading it. Remux afterwards instead: `ffmpeg -i final.mp4 -i final_master.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a 320k`.

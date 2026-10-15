@@ -3,7 +3,7 @@ Run from edit/. Writes final_master.wav and work/loudness.json."""
 import numpy as np, soundfile as sf, subprocess, json, re
 from scipy.signal import resample_poly
 from scipy.ndimage import minimum_filter1d
-SR = 48000; CEIL = 10 ** (-1.3 / 20)
+SR = 48000; CEIL = 10 ** (-1.8 / 20)   # -1.8 dBTP on the WAV: AAC encoding overshoots ~0.6 dB, so the delivered MP4 stays under -1 dBTP
 x = sum(sf.read(f'stems/{k}.wav')[0] for k in ['voice', 'sfx', 'riser', 'music'])   # no per-stem changes
 up = np.max(np.abs(resample_poly(x, 4, 1, axis=0)), axis=1).reshape(-1, 4).max(axis=1)[:len(x)]
 need = np.minimum(1.0, CEIL / np.maximum(up, 1e-9))
