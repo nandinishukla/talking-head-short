@@ -49,6 +49,9 @@ These are the things that actually went wrong or cost time on the first short. E
 - A translucent pill box nearly disappears over a dark background; that's acceptable (the text keeps its shadow), but check pills over light graphics.
 - Strip trailing punctuation from hero big words ("CUSTOMERS." looks wrong at 230 px).
 
+- MONO captions (from the creator's reference edit): the box grows with the typed letters and is anchored where the finished line's left edge will be, so the text never shifts. While the keyword is still typing, crop its accent block a few pixels past the last letter; otherwise the accent cursor sits on the accent block and disappears.
+- The clothing-colour pick samples three frames (t, t+0.8 s, t+1.6 s). A single frame let a hand or hair over the torso pick a muddy colour (#C781A9 instead of the shirt's lavender).
+
 ## Storyboard
 - Plan captions (pill vs hero) before the storyboard: the sketches show caption style and position, and the beat table lists every hero moment.
 - Generate thumbnails from the oriented intermediate through the EDL (out time → source time), not from the camera track: the storyboard comes before the track is built.

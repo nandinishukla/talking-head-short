@@ -8,7 +8,7 @@ What it does:
 - explains with pictures: product logos and icons popping in, flow arrows, callouts on real screens, step chips, status cards, timelines and loop diagrams;
 - rotates through three layouts: full cam, a split with your head popping out of a camera card, and full-frame "luxury tech" graphics with a moving world camera and real motion blur;
 - plans the whole edit as a storyboard and beat table and waits for your approval before rendering;
-- burns in two caption styles: small pill captions over visuals, and big hero words in a solid colour matched to the speaker's clothes for the hook and key lines; adds a cover title and a CTA (a typed comment box, or a big typed comment pill with a link chip);
+- burns in captions in one small style per video (a terminal typewriter for tech videos, or calm pills) plus big hero words in a solid colour matched to the speaker's clothes for the hook and key lines; adds a cover title and a CTA (a typed comment box, or a big typed comment pill with a link chip);
 - synthesizes every sound effect, the riser and the music bed in numpy, and mixes to -14 LUFS;
 - writes a QA'd report.
 
@@ -42,4 +42,4 @@ The motion references in `references/motion-prompts.md` come from [prompt-motion
 The prompts belong to their creators.
 
 ## Licences
-Code: MIT. Fonts in `assets/fonts/` (Poppins, Archivo Black, EB Garamond, IBM Plex Mono, Inter) are under the SIL Open Font License 1.1.
+Code: MIT. Fonts in `assets/fonts/` (Poppins, Archivo Black, VT323, EB Garamond, IBM Plex Mono, Inter) are under the SIL Open Font License 1.1.

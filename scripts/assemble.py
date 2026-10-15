@@ -93,6 +93,7 @@ def open_run(r):
 
 # ---------- captions: pill layers are pre-rendered; hero letters are filled from each frame ----------
 CAPS = json.load(open('work/captions.json')); _cache = {}
+ACC = np.array([int((json.load(open('work/accent.json'))['color'] if os.path.exists('work/accent.json') else '#D97757')[i:i + 2], 16) for i in (1, 3, 5)], np.float32)
 def layer(k, name, flag=cv2.IMREAD_UNCHANGED):
     if (k, name) not in _cache:
         im = cv2.imread(f'work/captions/{k:03d}_{name}.png', flag)
@@ -116,6 +117,16 @@ def draw_captions(out, t):
         u = t - c['start']
         if c['style'] == 'pill':                                     # quick 80 ms fade + 4% settle
             blit(out, scaled(layer(c['k'], 'pill'), 0.96 + 0.04 * ease_out(u / 0.12)), c['x'], c['y'], ease_out(u / 0.08))
+        elif c['style'] == 'mono':                                    # typewriter: box grows with the typed letters
+            n = int(min(c['n'], max(1, (u * c['cps']) + 1)))
+            L = layer(c['k'], 'mono'); xe = c['edges'][n]; bw = xe + c['px']; x0, y0, h = c['x'], c['y'], c['h']
+            typing = n < c['n']; cur_on = typing or int((u - c['n'] / c['cps']) * 2.4) % 2 == 0
+            box = np.zeros((h, xe + c['gap'] + c['cw'] + c['px'], 4), np.float32); box[..., :3] = np.array([18, 18, 20]) / 255; box[..., 3] = 0.92
+            blit(out, box, x0, y0)
+            blit(out, L[:, :(xe + 8 if typing else bw)], x0, y0)            # accent block ends just past the last typed letter
+            if cur_on:
+                cur = np.zeros((h - 2 * c['py'] - 8, c['cw'], 4), np.float32); cur[..., :3] = ACC / 255; cur[..., 3] = 1
+                blit(out, cur, x0 + xe + c['gap'], y0 + c['py'] + 4)
         else:                                                         # hero: big solid word lands, pills fade in
             s = 1.08 - 0.08 * ease_out(u / 0.22); op = ease_out(u / 0.10)
             mask = scaled(layer(c['k'], 'mask', cv2.IMREAD_GRAYSCALE), s)[..., None] * op
