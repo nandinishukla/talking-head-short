@@ -21,6 +21,7 @@ The prompts in this file come from these prompt-motion.com entries (creator hand
 | @gautam-mer1 | https://prompt-motion.com/customize/gautam-mer1-2ae354 |
 | @lester-tyy | https://prompt-motion.com/customize/lester-tyy-f897f7 |
 | @yunn260414 | https://prompt-motion.com/customize/yunn260414-60d996 |
+| @francoxavier33 | https://prompt-motion.com/customize/francoxavier33-d2dfd2 |
 
 Which entry each block below came from is still to be matched; until then each block's "Source" line points here.
 
@@ -515,3 +516,13 @@ Check every number and name against a source. Keep the diagram's layout fixed so
 Show me the script, the diagram and a timed storyboard, then build it without asking me anything else. Give me the final MP4.
 </start>
 ```
+
+
+---
+
+## product-showreel-throughline (variant: 20 s hype launch, VERTICAL 1080x1920)
+- Source: [prompt-motion.com/customize/francoxavier33-d2dfd2](https://prompt-motion.com/customize/francoxavier33-d2dfd2) by @francoxavier33
+- Added: 2026-10-14
+- Identical to the base block except two lines:
+  - <direction> line 1: "A 20-second hype launch video for @momwiseai. Research it first: what it does, who it's for, its real interface and its brand. Use what you find; never invent screens, features or numbers."
+  - <build> step 1: "One HTML file at 1080x1920." (vertical)
