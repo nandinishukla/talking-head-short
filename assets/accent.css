@@ -1,0 +1,2 @@
+/* default accent; scripts/accent.py writes the per-video one into work/gfx/assets/ */
+html:root { --clay: #D97757; --clayText: #B25730; --band: #FBEEE8; }

@@ -78,6 +78,10 @@ for i, bt in enumerate(order):
     rows.append(f'<tr><td>{t0:.2f}–{t1:.2f}</td><td>{esc(bt["run"])}</td><td>{r[2]}</td><td>“{esc(words_between(t0, t1))}”</td>'
                 f'<td>{esc(bt.get("visual", ""))}</td><td>{esc(bt.get("camera", ""))}</td><td>{esc(bt.get("sfx", ""))}</td>'
                 f'<td>{esc(capcell)}</td><td>{esc(", ".join(bt.get("refs", [])))}</td><td>{esc(bt.get("source", ""))}</td></tr>')
+acc = json.load(open('work/accent.json')) if os.path.exists('work/accent.json') else None
+hc = json.load(open('work/hero_color.json'))['hero_color'] if os.path.exists('work/hero_color.json') else None
+sw = lambda c: f'<span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:{c};vertical-align:-2px;margin-right:4px"></span>'
+accline = (f'<p class="sub">Accent {sw(acc["color"])}{acc["color"]}: {esc(acc["why"])}' + (f' · hero captions {sw(hc)}{hc} (from the clothes)' if hc else '') + '</p>') if acc else ''
 cuts = ', '.join(f'{s["cut"]:.3f}' for s in E['segs'][1:])
 page = f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Storyboard</title><style>
@@ -94,7 +98,7 @@ main{{max-width:1100px;margin:0 auto;padding:24px 16px}} h1{{margin:0 0 4px}} .s
 th,td{{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}} th{{color:var(--mut);font-weight:600}}
 </style></head><body><main>
 <h1>Storyboard</h1><p class="sub">END {P["END"]*1000:.0f} ms · {len(runs)} runs · picture cuts at {cuts} s. Nothing has been rendered yet. Approve or ask for changes.</p>
-<div class="grid">{''.join(cards)}</div>
+{accline}<div class="grid">{''.join(cards)}</div>
 <h2>Beat table</h2><div class="tw"><table><thead><tr><th>Time (s)</th><th>Run</th><th>Layout</th><th>Words</th><th>On screen</th><th>Camera</th>
 <th>SFX</th><th>Caption</th><th>Motion refs</th><th>Source</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div>
 </main></body></html>'''
