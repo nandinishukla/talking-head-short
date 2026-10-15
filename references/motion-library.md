@@ -115,3 +115,18 @@ Sources to browse (by hand, as a viewer):
 - Borrow: explain a whole topic as **one diagram in one continuous space**. The camera zooms into a part to explain it and pulls back to show how it fits, so the viewer always knows where they are, and the layout never reshuffles. Every idea gets a picture before it gets words. Labels sit on the thing they name, never in a legend. One thing moves at a time; arrows and flows animate in the direction things actually move. No more than seven words on screen at once, each held at least 0.3 s. Structure: a hook question over the first picture; 3–5 steps that each zoom in, show one concrete example and pull back as that part locks into place; a final pull back to the complete diagram with a one-line takeaway. Narration timing drives the animation (time each beat to the real audio length of its line).
 - Avoid: walls of text, bullet lists, generic gradients, stock-looking icons, glows, crossfades, template looks. For a short, this fits a full-visual run that explains a process (how a tool works, a pipeline, a before/after) as one diagram the camera moves through. Here the speaker's real voice is the narration, so the TTS part doesn't apply, and the house rules in `brief.md` win.
 - Full prompt: `motion-prompts.md`.
+
+### creator-reference-explainer  (the user's own reference edit)
+- Link / creator: a reference video supplied by the user (a Harvey explainer short); not public, no link
+- Tags: product-ui, diagrams, photos, kinetic-type
+- Borrow: **explain with pictures, not text**.
+  - Product logos and icon tiles pop in, tilted and small, springing upright with a slight overshoot (about 0.25 s), and arrows draw in between them in the direction things flow (research → Claude → cold email). Then the real product screen slides up under the diagram.
+  - On real captures, an accent outline wipes onto the exact line being discussed and a mono label arrow slides in ("← WHAT YOU SELL"). Numbered step chips ("01 · FIND LEADS", "02 · RESEARCH THEM", "03 · BEST FITS") appear as each is said, next to the terminal row that lights up.
+  - A product title as a typographic pair, "It's called" in italic serif over a huge accent "Harvey", then tag chips pop in one per beat: "Open source", "MIT license", "$0 · free".
+  - Status cards stack ("Reply received", "Sales pipeline"), a stage timeline's dot advances from Outreach to Won, then an accent goal card lands ("Meeting booked").
+  - A loop diagram: steps round a dashed ring with a laptop icon in the middle and a dot travelling round, beside a huge "24/7".
+  - A "● LIVE" badge on the dashboard capture, and real captures in rounded windows with a thin accent border.
+  - **The comment-pill CTA (style B):** a big accent pill with a comment icon types `Comment “HARVEY”` (about 2 frames per letter), then a small white chip pops in under it: GitHub icon + "Free on GitHub · ethanplusai/harvey".
+  - Captions are a third style worth considering: uppercase monospace typed on a black box, the keyword on an accent block, with a blinking block cursor.
+- Avoid / not adopted: its dark grounds and grid-paper background (the house world is near-white, with no grid). The mono typewriter caption style isn't built yet; ask before switching to it.
+- Built as: `assets/motion/explain.js` + `explain.css` (iconPop, arrowDraw, callout, chips, status cards, stageTimeline, loopDiagram, ctaPill); demos `references/examples/motion/explain-*.html` and `references/examples/cta_pill.html`.

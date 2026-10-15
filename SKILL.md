@@ -99,8 +99,8 @@ Nothing gets rendered until the user has seen and approved the plan.
    - `r1`, `r3`, `r5`, `r7`: split worlds with steps and pushes;
    - `r2`: logo lockup, then a whip to a real capture in the fixed frame on its washed clone;
    - `r4`, `r6`, `r9`: product windows where only the inner camera moves;
-   - `cta`: the transparent comment card;
-   - `motion/*.html`: one demo per motion component (cursor, glass, morph, flood + iris, maskrise, kinetic, wall, whip); see "Motion components" below.
+   - `cta`: the transparent comment card (CTA style A); `cta_pill.html`: the comment pill (CTA style B);
+   - `motion/*.html`: one demo per motion component (cursor, glass, morph, flood + iris, maskrise, kinetic, wall, whip; explain-flow, explain-callout, explain-status, explain-loop); see "Motion components" and "Explainer components" below.
 
 How the engine works and the rules that matter:
 - `E.run(id, dur, render)` registers one paused timeline. `render(t)` must be a pure function of t.
@@ -146,6 +146,25 @@ Rules that come with them:
 - Springs are closed-form (`E.spring`, `E.sp` sums one spring per change), so seeking to any t gives the same frame. Keep the overshoot small (the defaults).
 - `glassBox` freezes the source's computed styles onto its clone and needs `g.mirror()` after the scene renders each frame. Keep words the viewer reads on the glass's content layer, sharp, never in the blurred clone.
 - Flood, contract and iris are transitions inside one run. Layout changes stay hard cuts.
+
+#### Explainer components (`assets/motion/explain.js` + `explain.css`)
+Pictures instead of text, taken from the creator's reference edit: product logos and icons popping in, arrows and callouts. Load `motion/core.js`, then `explain.js`, and link `explain.css`. Demos: `references/examples/motion/explain-*.html`.
+
+| Component | Use it for |
+|---|---|
+| `E.iconTile(parent, icon, label, {hero, svg})` + `E.iconPop(el, t, t0, {rot})`: a tile arrives tilted and small and springs upright (scale 0.8→1, −14°→0, small overshoot). Put the product's official logo in `svg` for the hero tile | a pipeline told as logos: research → Claude → cold email (`pop` event on each tile) |
+| `E.arrowEl(parent, len, 'right'/'down')` + `E.arrowDraw(el, t, t0)`: an accent arrow that draws in the direction of flow | joining tiles, steps or cards |
+| `E.callout(box, label, t, t0)` with `.xp-callout-box` / `.xp-callout-label`: an accent outline wipes onto one line of a real capture, then a label arrow slides in ("← WHAT YOU SELL") | pointing at the exact line or field the speaker means |
+| `.xp-chip` (`.step` for numbered "01 · FIND LEADS", `.accent` for a highlighted tag) + `E.chipPop(el, t, t0)` | numbered steps next to the rows they mark; tag chips under a product title ("Open source", "MIT license", "$0 · free") |
+| `.xp-card` (+ `.accent`) with `E.icon(...)`, landed with `E.land` | stacked status cards ("Reply received", "Sales pipeline"), and an accent goal card ("Meeting booked") with a `chime` |
+| `E.stageTimeline(parent, labels)` + `E.stageAt(el, t, [[t, stage], ...])`: stage dots on a line, a progress dot springing stage to stage | a pipeline advancing (outreach → won) |
+| `E.loopDiagram(parent, labels, r)` + `E.loopAt(el, t, t0, lap)`: labels round a dashed ring with a device in the middle and a dot travelling the loop | anything that repeats ("every 15 minutes", "24/7") |
+| `E.ctaPill(parent, keyword, chipHtml)` + `E.ctaPillAt(el, t, t0, typeAt)`: CTA style B, see below | the outro CTA |
+
+#### CTA style (one per video, alternate between videos)
+Set `"cta_style": "box"` or `"pill"` in project.json and say which one in the storyboard.
+- `box` (style A): `references/examples/cta.html`, a comment box with an avatar, the keyword typed with a caret, and a Post press.
+- `pill` (style B): copy `references/examples/cta_pill.html` to `work/gfx/compositions/cta.html`. A big accent pill with a comment icon, `Comment “KEYWORD”` typed in capitals, then a white chip saying where to get it (e.g. GitHub icon + "Free on GitHub · owner/repo"). Set the timings from the CTA line's words in `plan.py`.
 
 ### 9. Camera track and mattes
 1. `$PY $S/camtrack.py work/cam1080.mp4` writes the frame-exact 60 fps cut (cover-fit full cam, plus `camwide.mp4` for 16:9 split footage) and prints a check that every join shows the new take from its first frame.

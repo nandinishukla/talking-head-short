@@ -5,9 +5,10 @@ A Claude Code skill that turns a raw talking-head recording into a finished 9:16
 What it does:
 - syncs and transcribes the recording, keeps the last good take of every line and cuts retakes, pauses and false starts;
 - builds a J-cut voice track and checks eye contact;
+- explains with pictures: product logos and icons popping in, flow arrows, callouts on real screens, step chips, status cards, timelines and loop diagrams;
 - rotates through three layouts: full cam, a split with your head popping out of a camera card, and full-frame "luxury tech" graphics with a moving world camera and real motion blur;
 - plans the whole edit as a storyboard and beat table and waits for your approval before rendering;
-- burns in two caption styles: small pill captions over visuals, and big hero words in a solid colour matched to the speaker's clothes for the hook and key lines; adds a cover title and a CTA comment card;
+- burns in two caption styles: small pill captions over visuals, and big hero words in a solid colour matched to the speaker's clothes for the hook and key lines; adds a cover title and a CTA (a typed comment box, or a big typed comment pill with a link chip);
 - synthesizes every sound effect, the riser and the music bed in numpy, and mixes to -14 LUFS;
 - writes a QA'd report.
 

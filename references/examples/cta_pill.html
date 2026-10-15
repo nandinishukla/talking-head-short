@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><link rel="stylesheet" href="../assets/motion/explain.css">
+<script src="../assets/engine.js"></script><script src="../assets/motion/core.js"></script><script src="../assets/motion/explain.js"></script>
+<style> html, body { background: transparent !important; } #root { background: none !important; } </style></head><body>
+<!-- CTA style B (comment pill): copy to work/gfx/compositions/cta.html; set KEYWORD, the chip text and the timings from plan.py
+     (pill on the CTA word, typing on the keyword). Transparent overlay over the outro's full cam, lower third, nothing else on it. -->
+<div id="root" data-composition-id="cta" data-start="0" data-duration="5.133" data-width="1080" data-height="1920"><div id="stage" style="position:absolute;inset:0"></div></div>
+<script type="application/json" id="events">[{"t":0.3,"t1":0.95,"type":"keys","n":8},{"t":1.55,"type":"pop"}]</script>
+<script>
+const KEYWORD = 'Harvey', CHIP = E.icon('github', 44) + 'Free on GitHub · ethanplusai/harvey';
+const c = E.ctaPill(document.getElementById('stage'), KEYWORD, CHIP);
+c.style.left = '0'; c.style.right = '0'; c.style.top = '1330px';
+function render(t) { E.ctaPillAt(c, t, 0.0, 0.3); }
+E.run('cta', 5.133, render);
+</script></body></html>

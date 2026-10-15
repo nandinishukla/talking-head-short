@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="../assets/base.css"><link rel="stylesheet" href="../assets/motion/explain.css">
 <script src="../assets/engine.js"></script><script src="../assets/motion/core.js"></script><script src="../assets/motion/explain.js"></script>
 <style>
-  #big { left: 70px; top: 420px; font-family: Poppins; font-weight: 700; font-size: 230px; line-height: 1; color: var(--clay); letter-spacing: -0.04em; }
+  #big { left: 50px; top: 420px; font-family: Poppins; font-weight: 700; font-size: 230px; line-height: 1; color: var(--clay); letter-spacing: -0.04em; }
   #sub { left: 80px; top: 670px; font-family: Garamond; font-style: italic; font-size: 64px; }
   #lap { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #111; }
 </style></head><body>
@@ -15,7 +15,7 @@
 <script>
 // a loop diagram: steps around a dashed ring with a device in the middle; a dot travels the loop
 const S = document.getElementById('stage');
-const L = E.loopDiagram(S, ['WAKE', 'BUDGET', 'DECIDE', 'ACT', 'LOG', 'SLEEP'], 150); L.style.left = '640px'; L.style.top = '420px';
+const L = E.loopDiagram(S, ['WAKE', 'BUDGET', 'DECIDE', 'ACT', 'LOG', 'SLEEP'], 150); L.style.left = '700px'; L.style.top = '440px';
 E.el(L, 'div', '', '<div id="lap">' + E.icon('laptop', 90) + '</div>');
 function render(t) {
   E.track(L, t, { o: [[0, 0], [0.3, 1]], s: [[0, 0.85], [0.5, 1, 'p3o']] });
