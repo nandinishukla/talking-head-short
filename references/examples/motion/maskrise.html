@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><script src="../assets/engine.js"></script>
+<script src="../assets/motion/core.js"></script><script src="../assets/motion/text.js"></script>
+<style>
+  .blk { position: absolute; left: 100px; bottom: calc(1920px - 960px); width: 880px; }
+  .blk em { font-style: normal; color: var(--clayText); }
+  #rule { position: absolute; left: 100px; top: 984px; height: 8px; border-radius: 4px; background: var(--clay); }
+  #sub { position: absolute; left: 100px; top: 1030px; width: 880px; }
+</style></head>
+<body>
+<div id="root" data-composition-id="maskrise" data-start="0" data-duration="4.4" data-width="1080" data-height="1920">
+  <div class="blk h1" id="a"></div>
+  <div class="blk h1" id="b"></div>
+  <div id="rule"></div>
+  <div class="body" id="sub" style="color:#555"></div>
+</div>
+<script>
+const $ = (id) => document.getElementById(id);
+// the rule is the mask line: lines rise out of it; block a leaves (top line first) before block b rises
+const A = E.maskLines($('a'), ['Every lead', 'scored', '<em>overnight.</em>']);
+const B = E.maskLines($('b'), ['12 emails', 'waiting for', '<em>your yes.</em>']);
+const S = E.maskLines($('sub'), ['Harvey drafts. You approve.']);
+function render(t) {
+  $('rule').style.width = (880 * E.kf(t, [[0.1, 0], [0.55, 1, 'p3o']])).toFixed(1) + 'px';
+  E.maskRiseAt(A, t, { tin: 0.35, tout: 2.0 });
+  E.maskRiseAt(B, t, { tin: 2.5 });
+  E.maskRiseAt(S, t, { tin: 3.0 });
+}
+E.run('maskrise', 4.4, render);
+</script>
+</body></html>

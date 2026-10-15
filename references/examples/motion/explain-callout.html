@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><link rel="stylesheet" href="../assets/motion/explain.css">
+<script src="../assets/engine.js"></script><script src="../assets/motion/core.js"></script><script src="../assets/motion/explain.js"></script>
+<style>
+  #code { left: 40px; top: 300px; width: 1000px; height: 720px; padding: 44px 40px; font-family: Plex; font-size: 30px; line-height: 64px; color: #444; white-space: pre; overflow: hidden; }
+  #code .c { color: #9a988f; }
+</style></head><body>
+<div id="root" data-composition-id="explain-callout" data-start="0" data-duration="4.5" data-width="1080" data-height="1920">
+  <div class="obj card doc" id="code"><span class="c"># 3. Learn your product</span>
+harvey train https://you.com
+<span class="c"># 4. Choose a good prospect</span>
+harvey signals --confirm free
+<span class="c"># 5. Find businesses</span>
+harvey discover
+harvey run</div>
+  <div class="xp-callout-box" id="b1" style="left:64px;top:401px;width:560px;height:60px"></div>
+  <div class="xp-callout-label" id="l1" style="left:650px;top:410px">&larr; WHAT YOU SELL</div>
+  <div class="xp-chip step" id="c1" style="left:60px;top:1080px">01 · FIND LEADS</div>
+  <div class="xp-chip step" id="c2" style="left:60px;top:1150px">02 · RESEARCH THEM</div>
+  <div class="xp-chip step" id="c3" style="left:60px;top:1220px">03 · BEST FITS</div>
+</div>
+<script type="application/json" id="events">[]</script>
+<script>
+// an outline callout wipes onto one real line and a label arrow slides in; numbered step chips appear as each step is said
+const $ = (i) => document.getElementById(i);
+function render(t) {
+  E.callout($('b1'), $('l1'), t, 0.4);
+  E.chipPop($('c1'), t, 1.8); E.chipPop($('c2'), t, 2.5); E.chipPop($('c3'), t, 3.2);
+}
+E.run('explain-callout', 4.5, render);
+</script></body></html>

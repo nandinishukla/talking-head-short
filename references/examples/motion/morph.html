@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><script src="../assets/engine.js"></script>
+<script src="../assets/motion/core.js"></script><script src="../assets/motion/morph.js"></script>
+<style>
+  .sub { font-size: 34px; font-weight: 400; opacity: .9; margin-top: 8px; }
+</style></head>
+<body>
+<div id="root" data-composition-id="morph" data-start="0" data-duration="5" data-width="1080" data-height="1920">
+</div>
+<script type="application/json" id="events">[{"t":1.2,"type":"pop"},{"t":2.4,"type":"pop"},{"t":3.6,"type":"chime"}]</script>
+<script>
+// one Clay shape: chip -> bubble -> card -> pill; text swaps inside its own mask
+const m = E.morphShape(document.getElementById('root'), [
+  { t: 0, x: 540, y: 640, w: 440, h: 120, r: 60, html: 'Lead found ✓', font: 46 },
+  { t: 1.2, w: 380, h: 380, r: 190, html: '62%', font: 120 },
+  { t: 2.4, y: 700, w: 900, h: 560, r: 40, html: 'Email drafted<div class="sub">Cascade Landscaping</div>', font: 64 },
+  { t: 3.6, y: 640, w: 560, h: 130, r: 65, html: 'Sent ✓', font: 52, fill: '#34C759' },
+]);
+E.run('morph', 5, (t) => m.render(t));
+</script>
+</body></html>

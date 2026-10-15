@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><script src="../assets/engine.js"></script>
+<script src="../assets/motion/core.js"></script><script src="../assets/motion/flood.js"></script><script src="../assets/motion/text.js"></script>
+<style>
+  .scene { position: absolute; inset: 0; }
+  #a .card { position: absolute; left: 90px; top: 360px; width: 900px; height: 700px; padding: 64px 70px; }
+  #btn { position: absolute; left: 360px; top: 900px; width: 360px; height: 120px; border-radius: 60px; background: var(--clay); color: #fff; font-size: 44px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+  #fl { position: absolute; background: var(--clay); z-index: 30; }
+  #pillTxt { position: absolute; left: 0; width: 1080px; top: 382px; text-align: center; color: #fff; font-size: 52px; font-weight: 700; z-index: 31; }
+  #b .card { position: absolute; left: 90px; top: 560px; width: 900px; height: 520px; padding: 56px 64px; }
+  .ln { font-size: 36px; line-height: 1.9; }
+  .ln b { color: var(--clayText); font-weight: 600; }
+  #c { display: flex; align-items: center; justify-content: center; }
+  #c .card { width: 820px; height: 520px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+</style></head>
+<body>
+<div id="root" data-composition-id="flood" data-start="0" data-duration="4.6" data-width="1080" data-height="1920">
+  <div class="scene" id="a"><div class="card doc"><div class="h2">12 emails ready</div><div class="body" style="color:#555">Every one written for its business,<br>waiting for your approval.</div></div><div id="btn">Approve all</div></div>
+  <div class="scene" id="b"><div class="card doc"><div class="ln">Cascade Landscaping <b>sent</b><br>Rose City Grounds <b>sent</b><br>Alder Creek Landscape <b>sent</b><br>Bridgetown Yard <b>sent</b></div></div></div>
+  <div class="scene" id="c"><div class="card doc"><div class="h1">Done.</div><div class="body" style="color:#555;margin-top:12px">Replies land in your inbox</div></div></div>
+  <div id="fl"></div><div id="pillTxt"></div>
+</div>
+<script type="application/json" id="events">[{"t":0.9,"type":"click"},{"t":1.95,"type":"pop"},{"t":3.75,"type":"pop"}]</script>
+<script>
+const $ = (id) => document.getElementById(id);
+const BTN = { x: 540, y: 960, w: 360, h: 120, r: 60 }, PILL = { x: 540, y: 420, w: 760, h: 140, r: 70 };
+const FL = { from: BTN, t0: 1.0, dur: 0.3, t1: 1.55, to: PILL };
+const pill = E.maskLines($('pillTxt'), ['12 emails sent']);
+const iris = E.irisEl($('root'));
+function render(t) {
+  const f = E.floodAt(t, FL);
+  // the button IS the flood shape: hide the DOM button once the shape takes over
+  $('btn').style.visibility = t > FL.t0 ? 'hidden' : 'visible';
+  $('btn').style.transform = `scale(${(1 - 0.05 * E.kf(t, [[0.9, 0], [0.97, 1, 'p2o'], [1.0, 0.6]])).toFixed(4)})`;
+  $('fl').style.display = t > FL.t0 ? 'block' : 'none';
+  E.rect($('fl'), f.rect);
+  // swap scenes while the frame is covered
+  $('a').style.display = t < 1.4 ? 'block' : 'none';
+  $('b').style.display = t >= 1.4 && t < 3.3 ? 'block' : 'none';
+  $('c').style.display = t >= 3.3 ? 'flex' : 'none';
+  $('fl').style.visibility = t >= 3.3 ? 'hidden' : 'visible';
+  E.maskRiseAt(pill, t, { tin: 1.85, tout: 2.95 });
+  $('pillTxt').style.visibility = t >= 3.3 ? 'hidden' : 'visible';
+  E.track($('b').firstChild, t, E.land(1.75));
+  // iris closes over scene b, snaps open on scene c
+  E.irisRender(iris, E.irisAt(t, { t0: 2.9, dur: 0.38, t1: 3.38, odur: 0.32 }));
+}
+E.run('flood', 4.6, render);
+</script>
+</body></html>

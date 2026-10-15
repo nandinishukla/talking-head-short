@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><script src="../assets/engine.js"></script>
+<script src="../assets/motion/core.js"></script><script src="../assets/motion/cursor.js"></script><script src="../assets/motion/glass.js"></script>
+<style>
+  #scene { position: absolute; inset: 0; }
+  #disc { left: 120px; top: 520px; width: 560px; height: 560px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--clay) 60%, white), var(--clay) 70%); }
+  #disc2 { left: 640px; top: 760px; width: 360px; height: 360px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #8FE3A6, #34C759 75%); }
+  #sheet { left: 160px; top: 1010px; width: 760px; height: 180px; padding: 40px 54px; border-radius: 40px; }
+  #chip { position: absolute; left: 470px; top: 300px; width: 140px; height: 140px; border-radius: 40px; background: #fff; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; font-family: Garamond; font-size: 92px; z-index: 30; }
+  .prompt { position: absolute; left: 56px; top: 50px; right: 56px; font-size: 44px; font-weight: 600; line-height: 1.3; }
+  .row { position: absolute; left: 56px; bottom: 44px; right: 44px; display: flex; align-items: center; gap: 26px; font-size: 30px; color: #555; }
+  .send { margin-left: auto; width: 76px; height: 76px; border-radius: 50%; background: var(--clay); color: #fff; font-size: 40px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+</style></head>
+<body>
+<div id="root" data-composition-id="glass" data-start="0" data-duration="4.5" data-width="1080" data-height="1920">
+  <div id="scene">
+    <div class="obj" id="disc"></div>
+    <div class="obj" id="disc2"></div>
+    <div class="obj card" id="sheet"><div class="h2">Harvey · outbox</div></div>
+  </div>
+  <div id="chip">H</div>
+</div>
+<script type="application/json" id="events">[{"t":0.95,"type":"click"},{"t":1.25,"t1":3.0,"type":"keys"}]</script>
+<script>
+const $ = (id) => document.getElementById(id);
+const g = E.glassBox($('root'), { source: $('scene') });
+g.content.innerHTML = '<div class="prompt" id="pr"></div><div class="row">Portland, OR · 12 leads<div class="send">↑</div></div>';
+const cur = E.cursorEl($('root'), 60);
+const KEYS = [{ t: 0, x: 980, y: 140 }, { t: 0.8, x: 560, y: 390, dur: 0.75 }, { t: 2.2, x: 900, y: 1040, dur: 0.7 }];
+const TARGET = { x: 540, y: 720, w: 940, h: 330, r: 60 };
+function render(t) {
+  // the scene behind the glass keeps moving, so the frosted clone has to follow it every frame
+  E.track($('disc'), t, { x: [[0, 0], [4.5, 140, 'sio']], y: [[0, 0], [4.5, -60, 'sio']] });
+  E.track($('disc2'), t, { x: [[0, 0], [4.5, -150, 'sio']] });
+  g.mirror();
+  const q = g.springOut(t, 1.0, { x: 540, y: 420 }, TARGET);
+  g.render(q);
+  g.content.style.opacity = E.kf(t, [[1.15, 0], [1.4, 1]]);
+  $('pr').innerHTML = E.typed('Find 12 landscapers who miss after-hours calls', 1.25, 26, t) + E.caret(t, t > 1.2);
+  $('chip').style.transform = `scale(${(1 - 0.06 * E.kf(t, [[0.95, 0], [1.02, 1, 'p2o'], [1.2, 0]])).toFixed(4)})`;
+  E.cursorApply(cur, E.cursorAt(t, KEYS, { hover: [[0.62, 1.4]], press: [0.95], show: [0.05, 9] }));
+}
+E.run('glass', 4.5, render);
+</script>
+</body></html>

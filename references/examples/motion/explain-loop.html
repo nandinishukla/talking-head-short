@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><link rel="stylesheet" href="../assets/motion/explain.css">
+<script src="../assets/engine.js"></script><script src="../assets/motion/core.js"></script><script src="../assets/motion/explain.js"></script>
+<style>
+  #big { left: 70px; top: 420px; font-family: Poppins; font-weight: 700; font-size: 230px; line-height: 1; color: var(--clay); letter-spacing: -0.04em; }
+  #sub { left: 80px; top: 670px; font-family: Garamond; font-style: italic; font-size: 64px; }
+  #lap { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #111; }
+</style></head><body>
+<div id="root" data-composition-id="explain-loop" data-start="0" data-duration="4" data-width="1080" data-height="1920"><div id="stage" style="position:absolute;inset:0"></div>
+  <div class="obj" id="big">24/7</div><div class="obj" id="sub">on your computer</div>
+</div>
+<script type="application/json" id="events">[]</script>
+<script>
+// a loop diagram: steps around a dashed ring with a device in the middle; a dot travels the loop
+const S = document.getElementById('stage');
+const L = E.loopDiagram(S, ['WAKE', 'BUDGET', 'DECIDE', 'ACT', 'LOG', 'SLEEP'], 150); L.style.left = '640px'; L.style.top = '420px';
+E.el(L, 'div', '', '<div id="lap">' + E.icon('laptop', 90) + '</div>');
+function render(t) {
+  E.track(L, t, { o: [[0, 0], [0.3, 1]], s: [[0, 0.85], [0.5, 1, 'p3o']] });
+  E.loopAt(L, t, 0.3, 2.4);
+  E.track(document.getElementById('big'), t, { o: [[0.4, 0], [0.6, 1]], s: [[0.4, 0.85], [0.85, 1, 'p3o']] });
+  E.track(document.getElementById('sub'), t, { o: [[0.9, 0], [1.2, 1]], y: [[0.9, 24], [1.3, 0, 'p3o']] });
+}
+E.run('explain-loop', 4, render);
+</script></body></html>

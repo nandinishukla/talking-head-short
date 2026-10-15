@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><link rel="stylesheet" href="../assets/motion/explain.css">
+<script src="../assets/engine.js"></script><script src="../assets/motion/core.js"></script><script src="../assets/motion/explain.js"></script>
+<style>
+  #t1 { left: 0; top: 260px; width: 1080px; text-align: center; font-family: Garamond; font-style: italic; font-size: 90px; }
+  #t2 { left: 0; top: 340px; width: 1080px; text-align: center; font-family: Poppins; font-weight: 700; font-size: 230px; color: var(--clay); letter-spacing: -0.03em; }
+</style></head><body>
+<div id="root" data-composition-id="explain-status" data-start="0" data-duration="6" data-width="1080" data-height="1920"><div id="stage" style="position:absolute;inset:0"></div>
+  <div class="obj" id="t1">It's called</div><div class="obj" id="t2">Harvey</div>
+</div>
+<script type="application/json" id="events">[{"t":3.3,"type":"pop"},{"t":3.75,"type":"pop"},{"t":5.4,"type":"chime"}]</script>
+<script>
+// tag chips pop under a title one per beat; then status cards stack, a stage timeline advances and the goal card lands in the accent
+const S = document.getElementById('stage'), $ = (i) => document.getElementById(i);
+const chip = (html, x, y, cls) => { const n = E.el(S, 'div', 'xp-chip ' + (cls || ''), html); n.style.left = x + 'px'; n.style.top = y + 'px'; return n; };
+const C = [chip(E.icon('github', 40) + 'Open source', 150, 680), chip('MIT license', 600, 680), chip('$0 · free', 410, 790, 'accent')];
+const card = (ic, a, b, y, cls) => { const n = E.el(S, 'div', 'xp-card ' + (cls || ''), '<div class="ib">' + E.icon(ic, 44) + '</div><div><div class="t1">' + a + '</div><div class="t2">' + b + '</div></div>'); n.style.left = '120px'; n.style.top = y + 'px'; n.style.width = '840px'; return n; };
+const K = [card('reply', 'Reply received', 'TRACKED · CLASSIFIED', 1040), card('funnel', 'Sales pipeline', 'EVERY CONVERSATION, STAGED', 1190)];
+const tl = E.stageTimeline(S, ['OUT', 'ENG', 'QUAL', 'PROP', 'NEG', 'WON']); tl.style.left = '150px'; tl.style.top = '1370px'; tl.style.width = '780px';
+const G = card('calendar', 'Meeting booked', 'THE GOAL OF EVERY THREAD', 1530, 'accent');
+function render(t) {
+  E.track($('t1'), t, { o: [[0, 0], [0.3, 1]], y: [[0, 30], [0.45, 0, 'p3o']] });
+  E.track($('t2'), t, { o: [[0.25, 0], [0.45, 1]], s: [[0.25, 0.9], [0.7, 1, 'p3o']] });
+  E.chipPop(C[0], t, 1.0); E.chipPop(C[1], t, 1.5); E.chipPop(C[2], t, 2.0);
+  E.track(K[0], t, E.land(3.0)); E.track(K[1], t, E.land(3.45));
+  tl.style.opacity = E.clamp((t - 3.8) / 0.2, 0, 1);
+  E.stageAt(tl, t, [[3.9, 0], [4.3, 1], [4.6, 2], [4.85, 3], [5.05, 4], [5.25, 5]]);
+  E.track(G, t, E.land(5.1));
+}
+E.run('explain-status', 6, render);
+</script></body></html>

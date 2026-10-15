@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><script src="../assets/engine.js"></script>
+<script src="../assets/motion/core.js"></script><script src="../assets/motion/wall.js"></script>
+<style>
+  .wc { position: absolute; inset: 0; padding: 34px 30px; }
+  .wc .av { width: 84px; height: 84px; border-radius: 50%; background: #F1EEE8; font-size: 40px; font-weight: 700; color: var(--clayText); display: flex; align-items: center; justify-content: center; }
+  .wc .nm { margin-top: 26px; font-size: 34px; font-weight: 600; line-height: 1.2; }
+  .wc .sc { position: absolute; left: 30px; bottom: 34px; font-size: 30px; color: #555; }
+  .wc .sc b { color: var(--clayText); font-weight: 700; }
+</style></head>
+<body>
+<div id="root" data-composition-id="wall" data-start="0" data-duration="6" data-width="1080" data-height="1920">
+</div>
+<script>
+const NAMES = ['Cascade Landscaping', 'Rose City Grounds', 'Alder Creek', 'Bridgetown Yard', 'Pearl Gardens', 'Willamette Turf', 'Hawthorne Green', 'Burnside Lawn', 'Laurel Hill', 'Forest Park Co', 'Sellwood Yards', 'Mt Tabor Gardens', 'St Johns Turf', 'Division Green', 'Alberta Lawns'];
+// seeded, not random: the score is a pure function of the card's index
+const score = (k) => 4 + ((k * 7 + 3) % 6);
+const w = E.cardWall(document.getElementById('root'), {
+  cols: 5, rows: 5, cw: 290, ch: 360, gap: 44, R: 1800, origin: '50% 36%',
+  card: (i, j) => { const k = j * 5 + i, n = NAMES[k % NAMES.length]; return `<div class="wc"><div class="av">${n[0]}</div><div class="nm">${n}</div><div class="sc">score <b>${score(k)}/10</b></div></div>`; },
+});
+// one named move: a crane that rises onto the wall and settles level, eased in and out
+const SHOT = { move: 'crane', t0: 0, t1: 5.6 };   // preset: low and close, looking up -> level
+E.run('wall', 6, (t) => w.render(t, { cam: E.filmCam(t, SHOT), wave: { t0: 0.8, t1: 5.4, from: -2, to: 8 } }));
+</script>
+</body></html>

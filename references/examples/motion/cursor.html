@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><script src="../assets/engine.js"></script>
+<script src="../assets/motion/core.js"></script><script src="../assets/motion/cursor.js"></script>
+<style>
+  #panel { left: 90px; top: 300px; width: 900px; height: 640px; padding: 64px 70px; }
+  #panel .h2 { margin-bottom: 18px; }
+  #panel .body { color: #555; }
+  #btn { position: absolute; left: 70px; bottom: 70px; width: 420px; height: 128px; border-radius: 64px; background: var(--clay); color: #fff; font-size: 44px; font-weight: 600; display: flex; align-items: center; justify-content: center; box-shadow: 0 14px 30px rgba(217,119,87,.35); }
+  #done { position: absolute; left: 530px; bottom: 104px; font-size: 40px; font-weight: 600; color: #111; display: flex; align-items: center; gap: 16px; }
+  #done i { width: 50px; height: 50px; border-radius: 50%; background: var(--green); color: #fff; font-style: normal; font-size: 32px; display: flex; align-items: center; justify-content: center; }
+</style></head>
+<body>
+<div id="root" data-composition-id="cursor" data-start="0" data-duration="4" data-width="1080" data-height="1920">
+  <div class="obj card doc" id="panel">
+    <div class="h2">Find customers</div>
+    <div class="body">Landscapers in Portland, OR<br>scored against your ICP</div>
+    <div id="btn">Run Harvey</div>
+    <div id="done"><i>✓</i>41 found</div>
+  </div>
+</div>
+<script type="application/json" id="events">[{"t":2.25,"type":"click"},{"t":2.55,"type":"pop"}]</script>
+<script>
+const $ = (id) => document.getElementById(id);
+const cur = E.cursorEl($('root'), 60), ACC = E.accent();
+// glide in from off-frame (expo.out), dive onto the button, then drift off to the result
+const KEYS = [{ t: 0, x: 1160, y: 240 }, { t: 1.25, x: 760, y: 470, dur: 1.0 }, { t: 2.0, x: 330, y: 850, dur: 0.6 }, { t: 3.6, x: 760, y: 1010, dur: 0.75 }];
+function render(t) {
+  const c = E.cursorAt(t, KEYS, { hover: [[1.8, 2.75]], press: [2.25], show: [0.05, 9] });
+  E.cursorApply(cur, c);
+  const p = E.kf(t, [[2.25, 0], [2.32, 1, 'p2o'], [2.5, 0, 'p2io']]);
+  $('btn').style.transform = `scale(${(1 - 0.05 * p).toFixed(4)})`;
+  $('btn').style.background = E.mixColor(ACC, '#000000', 0.1 * p);
+  E.track($('done'), t, { o: [[2.5, 0], [2.75, 1, 'p3o']], x: [[2.5, -30], [2.9, 0, 'p3o']] });
+}
+E.run('cursor', 4, render);
+</script>
+</body></html>

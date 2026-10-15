@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=1080, height=1920">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="../assets/base.css"><script src="../assets/engine.js"></script>
+<script src="../assets/motion/core.js"></script><script src="../assets/motion/whip.js"></script>
+<style>
+  #tile { left: 425px; top: 460px; width: 230px; height: 230px; display: flex; align-items: center; justify-content: center; font-family: Garamond; font-size: 160px; }
+  #name { left: 0; top: 740px; width: 1080px; text-align: center; }
+  #stat { left: 2250px; top: 380px; width: 900px; height: 560px; padding: 64px 70px; }
+  #stat .big { font-size: 220px; font-weight: 700; line-height: 1; color: var(--clayText); margin-top: 20px; letter-spacing: -0.04em; }
+</style></head>
+<body>
+<div id="root" data-composition-id="whip" data-start="0" data-duration="3.4" data-width="1080" data-height="1920">
+  <svg class="defs"><filter id="mbf" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur id="mb" stdDeviation="0 0"/></filter></svg>
+  <div class="viewport" id="vp"><div class="world" id="world">
+    <div class="obj card tile" id="tile">H</div>
+    <div class="obj h1" id="name">Harvey</div>
+    <div class="obj card doc" id="stat"><div class="h2">Leads this week</div><div class="big">41</div></div>
+  </div></div>
+</div>
+<script type="application/json" id="events">[{"t":1.65,"type":"whoosh"}]</script>
+<script>
+const $ = (id) => document.getElementById(id);
+// glide on the lockup, then ONE whip to the stat card; the turnover pose matches velocity across the midpoint
+const W = E.whip({ t0: 1.2, from: { x: 540, y: 660, s: 1.03 }, to: { x: 2700, y: 660, s: 1 } });
+const cam = E.path({ x: 540, y: 660, s: 1 }, [{ t0: 0, t1: 1.2, to: { x: 540, y: 660, s: 1.03 }, ease: 'sio' }, ...W.segs]);
+const camera = E.camera({ world: $('world'), viewport: $('vp'), blurNode: $('mb'), fx: 540, fy: 660, cam });
+E.run('whip', 3.4, (t) => camera(t));
+</script>
+</body></html>

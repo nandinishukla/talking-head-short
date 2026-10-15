@@ -93,13 +93,14 @@ Nothing gets rendered until the user has seen and approved the plan.
 5. Show it to the user (the page shows the accent swatch and why it was chosen): publish it as an artifact, or send the file, and give one line on what to look at. Then **end your turn and wait**. Apply their changes to project.json, regenerate, and show it again. Continue only on a clear approval.
 
 ### 8. Graphics (HyperFrames)
-1. Copy `assets/engine.js`, `assets/base.css`, `assets/accent.css` and `assets/fonts/` into `work/gfx/assets/` (then re-run `accent.py` so the per-video accent replaces the default), plus `hyperframes.json` from `hyperframes init`.
+1. Copy `assets/engine.js`, `assets/base.css`, `assets/accent.css`, `assets/fonts/` and `assets/motion/` into `work/gfx/assets/` (then re-run `accent.py` so the per-video accent replaces the default), plus `hyperframes.json` from `hyperframes init`.
 2. Write one `work/gfx/compositions/<run key lowercase>.html` per split/visual run. Its `data-duration` must equal the run exactly.
 3. Build exactly what the approved storyboard shows, matching each beat's motion references. Start from the closest example in `references/examples/`:
    - `r1`, `r3`, `r5`, `r7`: split worlds with steps and pushes;
    - `r2`: logo lockup, then a whip to a real capture in the fixed frame on its washed clone;
    - `r4`, `r6`, `r9`: product windows where only the inner camera moves;
-   - `cta`: the transparent comment card.
+   - `cta`: the transparent comment card;
+   - `motion/*.html`: one demo per motion component (cursor, glass, morph, flood + iris, maskrise, kinetic, wall, whip); see "Motion components" below.
 
 How the engine works and the rules that matter:
 - `E.run(id, dur, render)` registers one paused timeline. `render(t)` must be a pure function of t.
@@ -125,6 +126,26 @@ How the engine works and the rules that matter:
   - animate the action, never label it.
 - Every visible sound-worthy event goes in the composition's `<script type="application/json" id="events">` (pop / click / chime / thud for icons landing / flash for white flashes / whoosh at the whip midpoint / keys / ticks, run-relative). The audio step reads these, so SFX always land on their visuals.
 - `bash $S/render_gfx.sh draft r1 r2 …` then **look at every contact sheet**. When they're right, run `bash $S/render_gfx.sh final …` (240 fps → `tmix=frames=3,fps=60`) and `bash $S/render_gfx.sh cta`. Render one at a time on 8 GB machines.
+
+#### Motion components (`assets/motion/`)
+Reusable techniques from the motion library, built on the engine and pure functions of t like it. Copy `assets/motion/` next to `engine.js`, then load `motion/core.js` (springs, expo easing, `E.rect`, `E.accent`) followed by the files you need. Each one has a working demo in `references/examples/motion/<name>.html` (1080×1920, house style); start from the demo.
+
+| Component | File | Use it for | Library refs |
+|---|---|---|---|
+| `E.cursorEl` / `E.cursorAt(t, keys, {hover, press})` / `E.cursorApply`: macOS arrow, expo.out glides, leans toward its heading, 1.5× on hover, −15% on press | `cursor.js` | a cursor driving clicks in rebuilt UI (put a `click` event on each press) | product-sting-frame-exact, product-showreel-throughline |
+| `E.glassBox(root, {source})` → `g.mirror()`, `g.render(g.springOut(t, t0, point, rect))`: frosted panel (blurred, lightened clone of the scene behind) with a bright top rim, springing out of a point | `glass.js` | a prompt box, toolbar or panel over a coloured scene | launch-film-one-take-glass, product-sting-frame-exact |
+| `E.morphShape(parent, states)` → `m.render(t)`: one shape morphing chip → bubble → card → pill (size, radius, position and colour spring; text swaps inside its own mask, never overlapping) | `morph.js` | a status that changes (found → 62% → drafted → sent ✓) as one object instead of cuts | launch-film-one-take-glass, showreel-everything-transforms |
+| `E.floodAt(t, {from, t0, t1, to})` + `E.rect`: an element floods past all four corners in 0.3 s, then contracts into the next element; `E.irisEl` / `E.irisAt` / `E.irisRender`: six blades close on a hexagonal aperture and snap open | `flood.js` | a scene change *inside* a graphic run (swap the scene while covered) | launch-film-one-take-glass |
+| `E.maskLines(el, lines)` + `E.maskRiseAt(spans, t, {tin, tout})`: lines rise out of a mask line; outgoing and incoming blocks get separate timing | `text.js` | a headline or claim set in type | showreel-everything-transforms, launch-film-one-take-glass |
+| `E.kineticNumber(el, t, {t0, to, suffix, origin})`: a number counts (expo.out) while it grows out of a point on a spring | `text.js` | a figure the speaker says ("62%") | showreel-everything-transforms |
+| `E.cardWall(root, {cols, rows, card})` → `w.render(t, {cam: E.filmCam(t, shot), wave})`: cards on a gently curved CSS 3D wall, an accent wave tilting each card as it passes, one named film-camera move (`crane`, `dolly`, `orbit`, `push`) | `wall.js` | a hook or payoff full visual showing "many" (leads, customers, results) | gallery-3d-film-camera |
+| `E.whip({t0, from, to})` → `{segs, mid}`: the house whip as `E.path` segments (0.45 s power3.in out, 0.6 s power3.out in) with matched velocity at the turnover; `E.camera` adds the directional blur | `whip.js` | the one whip per run; put the `whoosh` event at `mid` | house-luxury-tech, product-sting-frame-exact |
+
+Rules that come with them:
+- The house rules still win: near-white ground, nothing dark, nothing under 30 px, one whip per run, frame 0 at rest. Fills default to the video's accent (`var(--clay)` / `E.accent()`), so never hard-code Clay.
+- Springs are closed-form (`E.spring`, `E.sp` sums one spring per change), so seeking to any t gives the same frame. Keep the overshoot small (the defaults).
+- `glassBox` freezes the source's computed styles onto its clone and needs `g.mirror()` after the scene renders each frame. Keep words the viewer reads on the glass's content layer, sharp, never in the blurred clone.
+- Flood, contract and iris are transitions inside one run. Layout changes stay hard cuts.
 
 ### 9. Camera track and mattes
 1. `$PY $S/camtrack.py work/cam1080.mp4` writes the frame-exact 60 fps cut (cover-fit full cam, plus `camwide.mp4` for 16:9 split footage) and prints a check that every join shows the new take from its first frame.
