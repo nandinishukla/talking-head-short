@@ -24,7 +24,8 @@ def thumb(t, name):
     if not os.path.exists(p):
         subprocess.run(['ffmpeg', '-v', 'error', '-y', '-ss', f'{src_time(t):.3f}', '-i', CAM, '-frames:v', '1', '-vf', 'scale=270:-2', '-q:v', '4', p])
     return 'data:image/jpeg;base64,' + base64.b64encode(open(p, 'rb').read()).decode() if os.path.exists(p) else ''
-def words_between(a, b): return ' '.join(w['t'] for w in W if a <= w['s'] < b)
+DISP = {int(k): v for k, v in CFG.get('captions', {}).get('display', {}).items()}   # same corrections as the captions
+def words_between(a, b): return ' '.join(x for x in (DISP.get(i, w['t']) for i, w in enumerate(W) if a <= w['s'] < b) if x)
 def cap_at(t):
     for c in caps:
         if c['start'] <= t < c['end']: return c
@@ -33,7 +34,7 @@ def cap_at(t):
 def sketch(r):
     """270x480 SVG: layout zones, speaker thumbnail where the camera shows, caption marker"""
     a, b, lay, name = r; key = name.split()[0]; img = thumb(a / 1000 + 0.05, key); s = 0.25
-    bs = [x for x in beats if x['run'] == key]; first = esc(bs[0]['visual'][:70]) if bs else ''
+    bs = [x for x in beats if x['run'] == key]; first = esc(bs[0]['visual'][:150]) if bs else ''
     g = ['<svg viewBox="0 0 270 480" width="270" height="480" xmlns="http://www.w3.org/2000/svg">',
          '<defs><clipPath id="c' + key + '"><rect x="-16" y="300" width="302" height="216" rx="50"/></clipPath></defs>']
     if lay == 'cam':
@@ -47,7 +48,8 @@ def sketch(r):
         if lay == 'split':
             g.append(f'<image href="{img}" x="0" y="150" width="270" height="480" preserveAspectRatio="xMidYMin slice" clip-path="url(#c{key})"/>')
             g.append('<rect x="-16" y="300" width="302" height="216" rx="50" fill="none" stroke="#111" stroke-width="1.5"/>')
-    for c in [c for c in caps if a / 1000 <= c['start'] < b / 1000][:1]:
+    inrun = [c for c in caps if a / 1000 <= c['start'] < b / 1000]
+    for c in ([x for x in inrun if x['style'] == 'hero'] or inrun)[:1]:     # show the hero moment if the run has one
         y = (c['y'] + (60 if c['style'] == 'pill' else 200)) * s
         col = c.get('color', '#FFE14D') if c['style'] == 'hero' else '#fff'   # hero marker shows the clothing colour
         g.append(f'<rect x="20" y="{y - 13}" width="230" height="26" rx="6" fill="rgba(0,0,0,.55)"/>'
