@@ -29,8 +29,9 @@
     for (const k in v0) out[k] = E.sp(t, keys.map((q) => [q[0], q[1][k], q[2]]), o);
     return out;
   };
-  // the per-video accent (assets/accent.css sets --clay); Clay #D97757 when none is set
-  E.accent = (name) => (getComputedStyle(document.documentElement).getPropertyValue(name || '--clay').trim() || '#D97757');
+  // the per-video accent as a hex string: --clay (fills), --clayText (text on white), --band (highlight band).
+  // base.css always defines them and accent.css overrides them per video, so never hard-code a colour.
+  E.accent = (name) => getComputedStyle(document.documentElement).getPropertyValue(name || '--clay').trim();
   E.mix = (a, b, u) => a + (b - a) * u;
   const rgb = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
   E.mixColor = function (a, b, u) {

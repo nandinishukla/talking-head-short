@@ -1,7 +1,7 @@
 // morphShape: ONE shape that morphs continuously through states (chip -> bubble -> card -> pill ...).
 // Size, radius, position and colour spring between states; the shape is its own text mask, and the
 // outgoing text leaves before the incoming text rises, so swapped text never overlaps.
-// Default fill = the video's accent (--clay; Clay #D97757 by default). State fills must be hex.
+// Default fill = the video's accent (var(--clay), read via E.accent()). State fills must be hex.
 // Ref: launch-film-one-take-glass ("one shape keeps morphing: Ordered ✓ -> Printing % -> ...").
 //
 // const m = E.morphShape(parent, [{t:0, x, y, w, h, r, html:'Ordered ✓'}, {t:1.2, w:300, h:300, r:150, html:'62%'}, ...]);
