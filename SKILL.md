@@ -85,7 +85,7 @@ Set `"cover": [line1, line2]` (write it from the hook if the user gave none, abo
 
 ### 7. Storyboard and beat table: STOP for approval
 Nothing gets rendered until the user has seen and approved the plan.
-1. Pick motion references for each graphic beat from `references/motion-library.md` (the user's curated house look). Never scrape third-party galleries. The library entries were added by the user, and some sites, e.g. prompt-motion.com, block AI crawlers.
+1. Pick motion references for each graphic beat from `references/motion-library.md` (the user's curated house look). If `references/motion-prompts.md` exists, it is the user's private copy of the full prompts, which never gets pushed; read the block for each cited id. Never scrape third-party galleries. The library entries were added by the user, and some sites, e.g. prompt-motion.com, block AI crawlers.
 2. Write `"beats"` in project.json, one or more per run: `{"run": "R1", "t": 0.0, "visual": "...", "camera": "...", "sfx": "...", "refs": ["id"], "source": "real capture / rebuilt UI / logo"}`. Optionally add `"storyboard_notes": {"R1": "why this layout"}`.
 3. `$PY $S/storyboard.py work/cam1080.mp4` writes `work/storyboard.html`: a 9:16 sketch per run (layout zones, the speaker's frame, the graphic, caption style and position) and the beat table (time, run, layout, exact words, on-screen action, camera move, SFX, caption style with every hero moment, motion refs, source).
 4. Show it to the user: publish it as an artifact, or send the file, and give one line on what to look at. Then **end your turn and wait**. Apply their changes to project.json, regenerate, and show it again. Continue only on a clear approval.

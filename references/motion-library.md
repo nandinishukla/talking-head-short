@@ -5,7 +5,7 @@ The references the graphics should look and move like. The storyboard (step 4b) 
 ## How to add a reference
 Add one block per reference you like. Keep the **creator credit and the link**. Put the technique in your own words under "Borrow"; that's what the skill actually uses.
 
-Only paste a creator's full prompt under "Prompt" if it's yours, or if the creator allows reuse. If this repo is public, everything here is public.
+Put full prompt texts in `motion-prompts.md` next to this file, under the same id. That file is git-ignored, so it stays on your machine, and the skill reads it when the storyboard cites the id. Only paste a full prompt here, in this public file, if it's yours or the creator allows reuse.
 
 ```
 ### <short-id>  (e.g. ui-zoom-typing)
@@ -33,3 +33,19 @@ Sources to browse (by hand, as a viewer):
 - Tags: product-ui, kinetic-type, photos
 - Borrow: one bright near-white world of floating white cards with the three-layer shadow; a world camera that glides, steps (0.5 s power3.inOut, 0.25 s before the word), pushes (1.2–2 s) and whips at most once per run, with motion blur along screen velocity. Real product UI types, streams and clicks inside a fixed window while only an inner camera moves. Real source pages sit in a fixed frame on a blurred, washed clone of themselves.
 - Avoid: anything dark, grids, label pills that restate the narration.
+
+### product-showreel-throughline
+- Link: prompt-motion.com (entry link and creator still to add)
+- Creator: see the prompt-motion.com entry
+- Tags: product-ui, kinetic-type
+- Borrow: pick one **through-line object** from the product (its cursor, a key button, the logo mark, one data point). It starts in the UI, changes shape or role at each scene change, and finally becomes the logo, so every transition is a match cut on that object. Measure its position at runtime rather than hard-coding it. Rebuild the UI as separate vector layers so parts move on their own, and let a cursor drive real clicks and drags while the camera zooms in screen-studio style until each moment fills the frame. Use springs with at most a small overshoot. Nothing pops in: elements grow, unfold or are revealed by a mask. The camera always drifts (about +4% per scene), and each scene starts at the zoom the last one ended on. Something changes on every beat (120 BPM). One accent colour, used only on the through-line object and the key word. Outgoing and incoming text get separate timing, so letters never overlap. A shape that fills the frame is scaled past all four corners.
+- Avoid: particle bursts, glows, lens flares, camera shake, RGB split, crossfades, generic gradients, bouncy easing, holds over half a second, template looks. Where it clashes with the house rules (16:9 canvas, "camera never still" vs. the house's frame 0 at rest, its own brand palette vs. the near-white world), the house rules in `brief.md` win.
+- Full prompt: private, in `motion-prompts.md` (not in this repo).
+
+### gallery-3d-film-camera
+- Link: prompt-motion.com (entry link and creator still to add)
+- Creator: see the prompt-motion.com entry
+- Tags: shapes, photos, kinetic-type
+- Borrow: a real 3D space (three.js) instead of flat cards. Many cards sit on gently curved walls that form corridors and, seen from above, resolve into a wordmark. Build the whole piece toward one **signature shot**. The camera is a film camera: one named move per shot (dolly, crane, orbit, push-in, rack focus), eased in and out, and it never passes through geometry. Use a key, fill and rim light with soft shadows, an environment map for reflections, fog for depth, physically based materials with varied roughness and ACES tone mapping, so nothing looks like a default material. Elements react to each other, driven by springs or simple physics: a wave of accent light runs along a wall and each card tilts as it passes, and a card unhinges, swings with weight and settles. Depth of field only on the shots that need it. Seed every random number and compute each frame from time, so the render matches the preview.
+- Avoid: default materials and lighting, floating text labels, glows everywhere, a slowly spinning object as the whole idea, tech-demo looks. For the shorts it suits a hook or a payoff visual (a full-frame run), rendered at 9:16 inside the house's near-white world; the house rules in `brief.md` win on format, type and levels.
+- Full prompt: private, in `motion-prompts.md` (not in this repo).
