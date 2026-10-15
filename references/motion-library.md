@@ -79,3 +79,26 @@ Sources to browse (by hand, as a viewer):
   - scan the render for single-frame pops (frame-difference spikes about 3× their neighbours).
 - Avoid: crossfades, blur-ins, "developing" brightness, 3D flips, particles, glows, holds over 1 s, template looks. Its sound rule (downloaded SFX) conflicts with the house rule (everything synthesized in code), so the house wins. In a short, use its flood/iris/morphing-shape transitions *inside* a graphic run (for example an order/status sequence as one morphing shape); layout changes stay hard cuts; format is 9:16 and the house rules in `brief.md` win.
 - Full prompt: private, in `motion-prompts.md` (not in this repo).
+
+### product-sting-frame-exact
+- Link: prompt-motion.com (entry link and creator still to add)
+- Creator: see the prompt-motion.com entry
+- Tags: product-ui, phone, kinetic-type, music
+- Borrow: a 12 s keynote-feel product sting, specified **frame by frame**: keyframe tables of exact positions, sizes, opacities and blur per frame, with hard cuts placed 2 frames before the beat they lead. The camera never cuts on a still frame. Every shot enters already moving (exponential ease-out) and leaves on an accelerating move or a blur ramp, with blur following speed and direction (separate x/y blur for smears). Story beats worth stealing for product UI:
+  - a header rises out of a coloured haze inside an app window;
+  - a cursor glides in, turns to face where it's heading, grows on hover and presses;
+  - an app icon with four coloured squares orbiting into a cross;
+  - the icon collapses into a menu-bar item, which springs out a frosted glass prompt box where the prompt types itself;
+  - a whip-tilt through a light flash into the answer page scrolling into place, with the key phrase in bold;
+  - a card rises over the page;
+  - stacked cards with giant frosted-glass titles (a blurred copy of the image clipped to the letters);
+  - a lone logo disc, then the end card.
+  - Frosted glass = a blurred, lightened copy of what's behind, clipped to the shape. A zoom smear = 20–30 scaled, faded copies.
+- Technique notes worth reusing:
+  - every value continuous in the frame number, so half-frames render cleanly for a 59.94 master: keyframe tables with interpolation, no flooring on motion;
+  - measure text only after fonts load;
+  - scale a whole lockup to fit when a name gets longer;
+  - a white element on a white page needs a 1 px edge and a faint shadow;
+  - heavy blur can erase a shape: lower it until the shape still reads.
+- Avoid: crossfades, frozen frames, stock UI kits, glows on UI text, unseeded randomness, template looks. Its palette (white, blues, navy; no purple or orange) and square 1080 format are specific to that brand. In a short, borrow its cursor behaviour, frosted-glass prompt box and cut/blur discipline inside graphic runs. The house rules in `brief.md` win on format, palette, type and sound.
+- Full prompt: private, in `motion-prompts.md` (not in this repo).
