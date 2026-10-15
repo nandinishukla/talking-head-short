@@ -2,8 +2,8 @@
   python assemble.py               -> final.mp4
   python assemble.py 0,240,1300    -> only write those frames as PNGs to work/qa/ (fast checks; stops at the max)
 Inputs: work/camtrack.mp4 (+_map.json), work/camwide.mp4 for landscape sources, work/gfx/final/<run>_60.mp4 per
-graphic run, work/matte/<RUN>.mov/.json per split run, work/gfx/final/cta.mov, work/cover.png, work/captions.ass,
-final_master.wav. Optional project.json "split": {"scale": 0.72, "y": 538} for PORTRAIT sources."""
+graphic run, work/matte/<RUN>.mov/.json per split run, work/gfx/final/cta.mov, work/cover.png, work/captions.json
+(+ work/captions/ layers from captions.py), final_master.wav. Optional project.json "split": {"scale": 0.72, "y": 538} for PORTRAIT sources."""
 import json, subprocess, sys, os, numpy as np, cv2
 SK = os.path.dirname(os.path.abspath(__file__)); FPS = 60
 P = json.load(open('work/plan.json')); END = P['END']; N = int(round(END * FPS)); runs = P['runs']
@@ -85,9 +85,51 @@ def open_run(r):
     if r is runs[-1] and os.path.exists('work/gfx/final/cta.mov'): d['cta'] = reader('work/gfx/final/cta.mov', 1080, 1920, 'rgba')
     return d
 
+# ---------- captions: pill layers are pre-rendered; hero letters are filled from each frame ----------
+CAPS = json.load(open('work/captions.json')); _cache = {}
+def layer(k, name, flag=cv2.IMREAD_UNCHANGED):
+    if (k, name) not in _cache:
+        im = cv2.imread(f'work/captions/{k:03d}_{name}.png', flag)
+        if im.ndim == 3: im = cv2.cvtColor(im, cv2.COLOR_BGRA2RGBA)
+        _cache[(k, name)] = im.astype(np.float32) / 255.0
+    return _cache[(k, name)]
+def ease_out(u): u = min(1.0, max(0.0, u)); return 1 - (1 - u) ** 3
+def blit(out, rgba, x, y, op=1.0):
+    h, w = rgba.shape[:2]; x0, y0 = max(0, x), max(0, y); x1, y1 = min(1080, x + w), min(1920, y + h)
+    if x1 <= x0 or y1 <= y0: return
+    src = rgba[y0 - y:y1 - y, x0 - x:x1 - x]; a = src[..., 3:4] * op
+    out[y0:y1, x0:x1] = out[y0:y1, x0:x1] * (1 - a) + src[..., :3] * 255 * a
+def scaled(img, s):
+    if abs(s - 1) < 1e-3: return img
+    h, w = img.shape[:2]; M = cv2.getRotationMatrix2D((w / 2, h / 2), 0, s)
+    return cv2.warpAffine(img, M, (w, h), flags=cv2.INTER_LINEAR)
+def draw_captions(out, t):
+    out = out.astype(np.float32)
+    for c in CAPS:
+        if not (c['start'] <= t < c['end']): continue
+        u = t - c['start']
+        if c['style'] == 'pill':                                     # quick 80 ms fade + 4% settle
+            blit(out, scaled(layer(c['k'], 'pill'), 0.96 + 0.04 * ease_out(u / 0.12)), c['x'], c['y'], ease_out(u / 0.08))
+        else:                                                         # hero: big see-through word lands, script fades in
+            s = 1.08 - 0.08 * ease_out(u / 0.22); op = ease_out(u / 0.10)
+            mask = scaled(layer(c['k'], 'mask', cv2.IMREAD_GRAYSCALE), s)[..., None] * op
+            sh = scaled(layer(c['k'], 'shadow', cv2.IMREAD_GRAYSCALE), s)[..., None] * op
+            y0 = c['y']; h = mask.shape[0]; y1 = min(1920, y0 + h); ys = max(0, y0)
+            reg = out[ys:y1]; m = mask[ys - y0:y1 - y0]; shd = sh[ys - y0:y1 - y0]
+            # the footage behind the band, enlarged 12%, desaturated a touch and washed 45% toward white
+            band = cv2.resize(reg, None, fx=1.12, fy=1.12, interpolation=cv2.INTER_LINEAR)
+            oy = (band.shape[0] - reg.shape[0]) // 2; ox = (band.shape[1] - 1080) // 2
+            fill = band[oy:oy + reg.shape[0], ox:ox + 1080]
+            g = fill.mean(axis=2, keepdims=True); fill = (fill * 0.7 + g * 0.3)
+            fill = np.clip((fill - 128) * 1.35 + 128, 0, 255) * 0.38 + 255 * 0.62   # high-key texture: bright, still see-through
+            reg[:] = reg * (1 - shd)                                  # shadow under the letters keeps them readable
+            reg[:] = reg * (1 - m) + fill * m
+            blit(out, layer(c['k'], 'script'), c['x'], y0, ease_out((u - 0.04) / 0.14))
+    return np.clip(out, 0, 255).astype(np.uint8)
+
 if ONLY is None:
     enc = subprocess.Popen(['ffmpeg', '-v', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', '1080x1920', '-r', str(FPS), '-i', '-',
-        '-i', 'final_master.wav', '-vf', f"subtitles=work/captions.ass:fontsdir={SK}/../assets/fonts", '-map', '0:v', '-map', '1:a',
+        '-i', 'final_master.wav', '-map', '0:v', '-map', '1:a',
         '-c:v', 'libx264', '-profile:v', 'high', '-preset', 'slow', '-crf', '14', '-pix_fmt', 'yuv420p', '-r', str(FPS),
         '-c:a', 'aac', '-b:a', '320k', '-ar', '48000', '-ac', '2', '-movflags', '+faststart', 'final.mp4'], stdin=subprocess.PIPE)
 else: os.makedirs('work/qa', exist_ok=True)
@@ -105,6 +147,7 @@ for i in range(N):
         c = d['cta']()
         if c is not None: a = c[..., 3:4].astype(np.float32) / 255; out = (out * (1 - a) + c[..., :3] * a).astype(np.uint8)
     if i == 0: a = cover[..., 3:4] / 255; out = (out * (1 - a) + cover[..., :3] * a).astype(np.uint8)
+    else: out = draw_captions(out, i / FPS)
     if ONLY is None: enc.stdin.write(np.ascontiguousarray(out).tobytes())
     elif i in ONLY: cv2.imwrite(f'work/qa/f{i:05d}.png', cv2.cvtColor(out, cv2.COLOR_RGB2BGR))
     if ONLY is not None and i >= max(ONLY): break

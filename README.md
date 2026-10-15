@@ -6,7 +6,8 @@ What it does:
 - syncs and transcribes the recording, keeps the last good take of every line and cuts retakes, pauses and false starts;
 - builds a J-cut voice track and checks eye contact;
 - rotates through three layouts: full cam, a split with your head popping out of a camera card, and full-frame "luxury tech" graphics with a moving world camera and real motion blur;
-- burns in captions with highlighted keywords, adds a cover title and a CTA comment card;
+- plans the whole edit as a storyboard and beat table and waits for your approval before rendering;
+- burns in two caption styles: small pill captions over visuals, and big see-through hero words for the hook and key lines; adds a cover title and a CTA comment card;
 - synthesizes every sound effect, the riser and the music bed in numpy, and mixes to -14 LUFS;
 - writes a QA'd report.
 
@@ -16,7 +17,7 @@ What it does:
 mkdir -p ~/.claude/skills && cp -R talking-head-short ~/.claude/skills/
 ```
 
-Then hand Claude a recording ("edit RAW.MP4 into a short"). Start with `SKILL.md`, which is the workflow. `references/brief.md` holds the full standard, and `references/lessons.md` lists the traps from the first real run.
+Add the motion references you like to `references/motion-library.md`. Then hand Claude a recording ("edit RAW.MP4 into a short"). Start with `SKILL.md`, which is the workflow. `references/brief.md` holds the full standard, and `references/lessons.md` lists the traps from the first real run.
 
 ## Contents
 - `SKILL.md`: the step-by-step workflow.
@@ -28,4 +29,4 @@ Then hand Claude a recording ("edit RAW.MP4 into a short"). Start with `SKILL.md
 macOS or Linux with Node 18+, Python 3.9+ and about 5 GB free disk. Everything else installs locally into the project via `scripts/setup.sh`.
 
 ## Licences
-Code: MIT. Fonts in `assets/fonts/` (Poppins, Instrument Serif, EB Garamond, IBM Plex Mono, Inter) are under the SIL Open Font License 1.1.
+Code: MIT. Fonts in `assets/fonts/` (Poppins, Pacifico, Archivo Black, EB Garamond, IBM Plex Mono, Inter) are under the SIL Open Font License 1.1.

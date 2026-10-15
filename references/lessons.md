@@ -40,6 +40,15 @@ These are the things that actually went wrong or cost time on the first short. E
 - `ffmpeg ... Broken pipe` at the end of assembly is harmless (unused tail frames of a source).
 - When polling a background job, `pgrep -f "assemble.py"` matches the polling shell's own command line, so the wait loop never ends. Poll for the output file or the PID instead.
 
+## Captions
+- Captions are composited in Python (`assemble.py`), not libass, because the hero style's letters must be filled with the live frame behind them. Pills are pre-rendered PNG layers; the hero big word is a mask filled per frame with the footage enlarged 12%, desaturated 30%, contrast up and washed 62% toward white, over a soft dark shadow. A weaker wash (45%) read grey and muddy over a dark room.
+- A translucent pill box nearly disappears over a dark background; that's acceptable (the text keeps its shadow), but check pills over light graphics.
+- Strip trailing punctuation from hero big words ("CUSTOMERS." looks wrong at 230 px).
+
+## Storyboard
+- Plan captions (pill vs hero) before the storyboard: the sketches show caption style and position, and the beat table lists every hero moment.
+- Generate thumbnails from the oriented intermediate through the EDL (out time → source time), not from the camera track: the storyboard comes before the track is built.
+
 ## Audio
 - A -14 LUFS talking voice peaks around +0.3 dBTP, so the master always needs the true-peak limiter. That's expected; report the max reduction (about 2 dB).
 - Put the whoosh by its **measured** loudest sample, not the envelope centre: band-pass filtering shifted the peak 40 ms early.

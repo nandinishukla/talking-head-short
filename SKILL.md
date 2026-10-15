@@ -1,6 +1,6 @@
 ---
 name: talking-head-short
-description: Edit a raw talking-head recording into a finished, ready-to-post 9:16 short (Instagram Reel, TikTok, YouTube Short) entirely in code. It covers syncing camera and clean audio, transcribing with word timestamps, picking the last good take of every line and cutting retakes, pauses and false starts with a J-cut voice track, and an eye-contact check. Each run gets one of three layouts (full cam, split with the head popping out of a camera card, full-frame "luxury tech" HyperFrames graphic with a moving world camera and motion blur). It also burns in captions with highlighted keywords, adds a cover title and a CTA comment card, synthesizes SFX, a riser and a music bed in numpy, mixes to -14 LUFS, and writes a report. Use it whenever someone hands you raw footage (a .MP4/.MOV of themselves talking) and wants a short, reel, TikTok, YouTube Short or "edit like a creator", wants retakes removed, captions, B-roll graphics or a vertical cut, or says "edit my video" — even if they don't name the steps.
+description: Edit a raw talking-head recording into a finished, ready-to-post 9:16 short (Instagram Reel, TikTok, YouTube Short) entirely in code. It covers syncing camera and clean audio, transcribing with word timestamps, picking the last good take of every line and cutting retakes, pauses and false starts with a J-cut voice track, and an eye-contact check. Each run gets one of three layouts (full cam, split with the head popping out of a camera card, full-frame "luxury tech" HyperFrames graphic with a moving world camera and motion blur). It plans the edit as a storyboard and beat table and waits for the user's approval before rendering anything. It burns in two caption styles (small pill captions, and big see-through hero words for the hook and key lines), adds a cover title and a CTA comment card, synthesizes SFX, a riser and a music bed in numpy, mixes to -14 LUFS, and writes a report. Use it whenever someone hands you raw footage (a .MP4/.MOV of themselves talking) and wants a short, reel, TikTok, YouTube Short or "edit like a creator", wants retakes removed, captions, B-roll graphics or a vertical cut, or says "edit my video" — even if they don't name the steps.
 ---
 
 # Talking-head → finished 9:16 short
@@ -9,9 +9,10 @@ The pipeline takes one raw recording (plus an optional clean-audio file) to `edi
 
 - **The standard:** `references/brief.md` is the full house brief, with every number for levels, geometry, timing, type and colour. When this file and the brief disagree on a number, the brief wins.
 - **Read before starting:** `references/lessons.md` covers the traps that cost hours on the first run.
+- **Motion library:** `references/motion-library.md` holds the user's curated motion references, the house look the graphics follow.
 - **Examples:** `references/examples/` holds the graphics from the first short (r1–r9 plus cta). `references/example-report.md` is a finished report.
 
-Work autonomously by default. The brief tells the user not to be asked anything: make each judgement call (take choice, layout, factual disagreement, unreachable UI), keep going, and log it for the report. Only stop if the input files are missing or unreadable.
+Work autonomously apart from one deliberate stop: the storyboard approval in step 7. The brief tells the user not to be asked anything: make each judgement call (take choice, layout, factual disagreement, unreachable UI), keep going, and log it for the report. The storyboard approval is the only point where you wait for the user. Only stop if the input files are missing or unreadable.
 
 ## Layout of a project
 
@@ -67,15 +68,32 @@ Put boundaries on picture cuts. `plan.py` then prints each run's words with run-
 
 ### 5. Research and captures
 For every named product and every claim (release, quote, number), find the real source and check figures against **two or more** reputable sources. Note any disagreement for the report.
-- Capture real pages with `node $S/shot.mjs <url> <out.png> 1280 1400 0`. It needs `CHROME=` pointing at the HyperFrames chrome-headless-shell in `~/.cache/hyperframes/chrome/`.
+- Capture real pages with `node $S/shot.mjs <url> <out.png> 1280 1400 0`, run from `edit/`. It finds HyperFrames' chrome-headless-shell itself. Respect each site's robots.txt and terms: capture the pages you cite, don't crawl.
 - Repos often ship a UI GIF or screenshots in `docs/`; rebuild the UI from those.
 - A login-walled UI is rebuilt from public screenshots or docs and noted in the report.
 - "Claude Code" means the Claude desktop app UI unless the speaker is talking about the terminal.
 
-### 6. Graphics (HyperFrames)
+### 6. Captions and cover (planned now, because the storyboard shows them)
+`$PY $S/captions.py`. Without `"captions.chunks"` it prints an auto draft (pill everywhere, one hero drafted in the hook). Edit it and paste it back. There are two styles:
+- **pill** `[a, b, "pill"]`: 1–3 words, small Poppins Bold on a translucent dark rounded box. Use it whenever the speaker talks over visuals or B-roll.
+- **hero** `[a, b, "hero", [big word indices]]`: 2–5 words with 1–2 HUGE see-through words (Archivo Black; the footage shows through the letters, washed bright) between small white script words (Pacifico) above and below. Use it in the hook and on important lines where only the speaker is on screen (full cam, or the card in a split), never over a graphic and never two in a row. Pick words that carry the meaning (the claim, number or benefit), never function words.
+
+Set `"cover": [line1, line2]` (write it from the hook if the user gave none, about 14 characters per line at 110 px). Set the pill centre per layout in `"y"` and the hero block centre in `"hero_y"`.
+- Captions must never sit on the face, the card edge or a visual.
+- With a portrait source the split gap is the face, so put pills at about y 1660 on the torso, and check the outro on a real frame.
+- `assemble.py` composites both styles; the hero fill is taken from each final frame.
+
+### 7. Storyboard and beat table: STOP for approval
+Nothing gets rendered until the user has seen and approved the plan.
+1. Pick motion references for each graphic beat from `references/motion-library.md` (the user's curated house look). Never scrape third-party galleries. The library entries were added by the user, and some sites, e.g. prompt-motion.com, block AI crawlers.
+2. Write `"beats"` in project.json, one or more per run: `{"run": "R1", "t": 0.0, "visual": "...", "camera": "...", "sfx": "...", "refs": ["id"], "source": "real capture / rebuilt UI / logo"}`. Optionally add `"storyboard_notes": {"R1": "why this layout"}`.
+3. `$PY $S/storyboard.py work/cam1080.mp4` writes `work/storyboard.html`: a 9:16 sketch per run (layout zones, the speaker's frame, the graphic, caption style and position) and the beat table (time, run, layout, exact words, on-screen action, camera move, SFX, caption style with every hero moment, motion refs, source).
+4. Show it to the user: publish it as an artifact, or send the file, and give one line on what to look at. Then **end your turn and wait**. Apply their changes to project.json, regenerate, and show it again. Continue only on a clear approval.
+
+### 8. Graphics (HyperFrames)
 1. Copy `assets/engine.js`, `assets/base.css` and `assets/fonts/` into `work/gfx/assets/`, plus `hyperframes.json` from `hyperframes init`.
 2. Write one `work/gfx/compositions/<run key lowercase>.html` per split/visual run. Its `data-duration` must equal the run exactly.
-3. Start from the closest example in `references/examples/`:
+3. Build exactly what the approved storyboard shows, matching each beat's motion references. Start from the closest example in `references/examples/`:
    - `r1`, `r3`, `r5`, `r7`: split worlds with steps and pushes;
    - `r2`: logo lockup, then a whip to a real capture in the fixed frame on its washed clone;
    - `r4`, `r6`, `r9`: product windows where only the inner camera moves;
@@ -106,11 +124,11 @@ How the engine works and the rules that matter:
 - Every visible sound-worthy event goes in the composition's `<script type="application/json" id="events">` (pop / click / chime / whoosh at the whip midpoint / keys / ticks, run-relative). The audio step reads these, so SFX always land on their visuals.
 - `bash $S/render_gfx.sh draft r1 r2 …` then **look at every contact sheet**. When they're right, run `bash $S/render_gfx.sh final …` (240 fps → `tmix=frames=3,fps=60`) and `bash $S/render_gfx.sh cta`. Render one at a time on 8 GB machines.
 
-### 7. Camera track and mattes
+### 9. Camera track and mattes
 1. `$PY $S/camtrack.py work/cam1080.mp4` writes the frame-exact 60 fps cut (cover-fit full cam, plus `camwide.mp4` for 16:9 split footage) and prints a check that every join shows the new take from its first frame.
 2. `$PY $S/matte.py` handles background removal per split run, unique source frames only, keyed by source frame. The head and card therefore come from the same frame even after retiming. For a portrait source the split geometry is derived (scale about 0.72, head clear of y 900); set `"split": {"scale", "y"}` if the framing differs, and check that the head clears the card.
 
-### 8. Audio
+### 10. Audio
 1. `$PY $S/audio.py` writes:
    - voice normalized to −14 LUFS;
    - SFX from the composition events, peaks relative to the voice peak: clicks/pops/chimes −10 dB, whooshes −9 dB, keys/ticks −16 dB;
@@ -118,27 +136,18 @@ How the engine works and the rules that matter:
    - a 110 BPM warm bed at −24 LUFS: one flat level, beat 1 on sample 1, 800 ms fade to END. Override with `"music": {"bpm", "chords"}`.
 2. `$PY $S/master.py` sums the stems, applies a look-ahead true-peak limiter only where needed (≤ −1 dBTP), and measures every stem and the master.
 
-### 9. Captions and cover
-`$PY $S/captions.py`. Without `"captions.chunks"` it prints an auto draft: review it, and fix highlights to product names, numbers, benefits and the CTA keyword (never function words). Paste it back and re-run. It enforces:
-- 1–3 words per chunk;
-- one highlight after every 2–3 normal chunks, never two in a row.
-
-Set `"cover": [line1, line2]` (write it from the hook if the user gave none, about 14 characters per line at 110 px). Set the caption centre per layout in `"y"`.
-- Captions must never sit on the face, the card edge or a visual.
-- With a portrait source the split gap is the face, so use about y 1660 on the torso, and check the outro on a real frame.
-
-### 10. Assemble and QA (look at real frames; don't assume)
+### 11. Assemble and QA (look at real frames; don't assume)
 1. Spot-check first with `$PY $S/assemble.py 0,240,1300,…`, looking at `work/qa/*.png` for the cover, head and card alignment, and caption positions. Then run the full `$PY $S/assemble.py`, which writes `final.mp4` and runs about 15 min.
 2. QA list:
    - frames on both sides of every join;
    - head present on the first frame of every split and aligned on fast moves;
-   - a contact sheet of the whole video (`fps=2,tile=12x9`): captions clear of face and visuals, yellow cadence, zones, nothing dark, frame 0 a clean cover;
+   - a contact sheet of the whole video (`fps=2,tile=12x9`): captions clear of face and visuals, heroes only where the speaker is alone (never two in a row), hero letters readable, zones, nothing dark, frame 0 a clean cover;
    - `ffprobe` shows 1080×1920 / 60 / 3,226-ish frames, AAC 48 k stereo;
    - `ebur128` on the final;
    - riser end, whoosh peak and join gaps from the stems.
 3. Fix, re-export, and repeat until everything passes.
 
-### 11. Report
+### 12. Report
 Write `edit/REPORT.md` with the structure of `references/example-report.md`:
 1. END in ms;
 2. the runs table;

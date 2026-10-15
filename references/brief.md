@@ -49,7 +49,14 @@ Rules:
 - No run over ~8 s, two runs in a row never share a layout, and all three layouts are used.
 - Write the plan as runs tiling [0, END] before building any graphic.
 
+4b. STORYBOARD AND BEAT TABLE (then STOP for my approval)
+- Before building or rendering any graphic, give me a storyboard and a beat table so I can see exactly how you plan the edit.
+- Storyboard: one 9:16 sketch per run showing the layout (cam / split / visual), my frame at that moment, what the graphic shows, and where and in which style the captions sit (pill or hero).
+- Beat table: every beat with its time range, run, layout, the exact words, what's on screen and what it's doing, the camera move, SFX, caption style (name every hero moment), the motion reference(s) from the library it draws on, and the source (real capture, rebuilt UI, logo).
+- Deliver it as one page I can open, then wait. Don't render anything until I approve or ask for changes; apply my changes and show it again.
+
 5. GRAPHICS (HyperFrames, one composition per run; use parallel subagents if you have them)
+- Follow the motion library (references/motion-library.md): match the look and motion of the references I've picked; each storyboard beat names the reference it draws on.
 The style is luxury tech: one bright world of floating white cards, and a camera that moves through it.
 - Ground: a radial near-white fill (#FFFFFF at 50%/36%, falling to #F3F3F0 at the edges). No grid, no orbs, nothing dark anywhere.
 - Every object off the ground carries one three-layer shadow: 0 60px 120px rgba(24,24,32,.16), 0 24px 48px rgba(24,24,32,.10), 0 4px 10px rgba(24,24,32,.06). Radii: media cards 3% of the width, docs 40, tiles 72, phones 84.
@@ -66,8 +73,11 @@ The style is luxury tech: one bright world of floating white cards, and a camera
 
 6. COVER, CAPTIONS, CTA
 - Cover: frame 0 only. My title in Poppins bold 110, black on a white rounded box (radius ~2.8%, soft shadow), centred at y 0.13 (about y 262-603 for two lines, ~50 px side padding). On frame 0 the intro graphic keeps everything below y 620.
-- Captions burned in from the FINAL voice track's word timings, starting at 17 ms (frame 0 stays clean). 1-3 words per chunk, Poppins bold 74, white, black stroke 10, no box. After every 2-3 normal chunks, one or two meaningful words (a product name, number, benefit, the CTA keyword) switch to Instrument Serif bold italic in pure yellow #FFFF00, same size and stroke. Never two highlights in a row, never function words.
-- Caption position per run, never on my face, the card edge or a visual: split = centred in the gap, y 941-1114; full cam and most visuals = bottom, y 1267-1536; a visual with low content = top, y 365-634; outro = centre, y 1037-1306.
+- Captions burned in from the FINAL voice track's word timings, starting at 17 ms (frame 0 stays clean). Two styles:
+  - PILL (the default, whenever I'm talking over visuals or B-roll): 1-3 words, Poppins bold ~64, white with a soft drop shadow, on a translucent dark rounded box (about 55% black, radius ~18). Small and calm; it must never compete with the visual.
+  - HERO (mostly in the hook, and on important lines when only I am on screen with no B-roll): a stacked moment of 2-5 words. One or two small words in a white script font (Pacifico) sit above, one or two HUGE words in a heavy sans (Archivo Black, uppercase, up to ~1000 px wide) sit in the middle, and the last small script word(s) sit below, e.g. "everybody / WANTED TO / know". The big word is see-through: its letters show the footage behind them, enlarged and washed bright, with a soft shadow so it stays readable. The big word lands with a short scale-settle; the script words fade in just after.
+  - Never two hero moments in a row; never put a hero over a visual. Choose hero words that carry the meaning (the claim, the number, the benefit), never function words.
+- Caption position per run, never on my face, the card edge or a visual: pills in the split = centred in the gap, y 941-1114 (for a portrait source this gap is my face: use the card over my torso instead); full cam and most visuals = bottom, y 1267-1536; a visual with low content = top, y 365-634; outro = centre, y 1037-1306 (keep it off my chin and above the CTA box). Hero blocks sit over my chest on full cam (centre about y 1380) or on the card in a split.
 - CTA card, outro only, lower third (box 43, 1344, 994x276): one centred comment box on a transparent canvas, a default avatar, the keyword from my CTA line typed with a blinking caret, then a Post button press. Nothing else: no panel, no background, no "DM me", no platform text.
 
 7. AUDIO: SYNTHESIZE EVERYTHING, THEN MIX TO THESE LEVELS
@@ -91,7 +101,7 @@ Build the picture from the cut plan: full cam runs from my footage, split runs a
 9. QA BEFORE YOU FINISH (look at real frames, don't assume)
 - Frames on both sides of every join: the new take shows from its first frame, the old one up to its last.
 - The head and the card stay aligned on fast head moves, and the head is there from the FIRST frame of every split.
-- A contact sheet of the whole video: captions clear of my face and the visuals, the cadence of yellow keywords, content inside its zones, no grid, nothing dark, frame 0 a clean cover.
+- A contact sheet of the whole video: captions clear of my face and the visuals, pill vs hero choices (heroes only in the hook or over me alone, never two in a row), content inside its zones, no grid, nothing dark, frame 0 a clean cover.
 - Audio: every SFX lands on its visual event, whooshes only on whip midpoints, the riser ends on the intro join, no join gap over 150 ms, the levels above hit within 0.5 LU.
 Fix anything that fails and re-export. Don't hand it back until it passes.
 
