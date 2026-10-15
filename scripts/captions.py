@@ -94,7 +94,7 @@ def clothing_colour(video, t_out):
     reg = np.concatenate(regs)
     hsv = np.array([colorsys.rgb_to_hsv(*p) for p in reg])
     skin = (hsv[:, 0] < 0.11) & (hsv[:, 1] > 0.18) & (hsv[:, 1] < 0.6) & (hsv[:, 2] > 0.35)
-    keep = (hsv[:, 2] > 0.22) & (hsv[:, 2] < 0.97) & ~skin
+    keep = (hsv[:, 2] > 0.38) & (hsv[:, 2] < 0.97) & ~skin       # lit fabric only: hair and shadows (dark) never decide the colour
     px = reg[keep] if keep.sum() > 200 else reg
     rng = np.random.default_rng(1); cent = px[rng.choice(len(px), 4, replace=False)]
     for _ in range(15):
