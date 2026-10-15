@@ -5,7 +5,7 @@ The references the graphics should look and move like. The storyboard (step 4b) 
 ## How to add a reference
 Add one block per reference you like. Keep the **creator credit and the link**. Put the technique in your own words under "Borrow"; that's what the skill actually uses.
 
-Put full prompt texts in `motion-prompts.md` next to this file, under the same id. That file is git-ignored, so it stays on your machine, and the skill reads it when the storyboard cites the id. Only paste a full prompt here, in this public file, if it's yours or the creator allows reuse.
+Put full prompt texts in `motion-prompts.md` next to this file, under the same id, with the source and creator credit; the skill reads it when the storyboard cites the id.
 
 ```
 ### <short-id>  (e.g. ui-zoom-typing)
@@ -44,7 +44,7 @@ Sources to browse (by hand, as a viewer):
 - Variant: a 40 s "product film" version with the same rules. At that length, give each product moment its own small arc (UI state → action → result) and keep the beat-driven changes, but let the camera breathe longer inside each moment.
 - Variant: a generic 30 s explainer for any product, with the same rules. It puts the weight on a strong script, good colours and good music, so people watch it more than once. For a short, that means the narration's hook, problem → product moments → payoff arc drives the beats, not the other way round.
 - Variants: the same template also appears as launch videos and product films for other products (only the product line changes), and as a showreel built **from the project's own codebase**. In the codebase version, read the code for the real screens, components, colours and type, and build scenes from those instead of from web research. Its "high-end launch film" form goes a step further and renders the frontend's **actual components** inside the film. There is also an **Apple-style vertical (1080x1920) version**: white space, one idea per shot, the device as the hero. It's the closest of all the references to this skill's 9:16 format, so prefer it when a full-visual run shows an app.
-- Full prompt: private, in `motion-prompts.md` (base plus 30 s, 40 s, explainer, launch-video and codebase variants; not in this repo).
+- Full prompt: `motion-prompts.md` (base plus 30 s, 40 s, explainer, launch-video and codebase variants).
 
 ### gallery-3d-film-camera
 - Link: prompt-motion.com (entry link and creator still to add)
@@ -52,7 +52,7 @@ Sources to browse (by hand, as a viewer):
 - Tags: shapes, photos, kinetic-type
 - Borrow: a real 3D space (three.js) instead of flat cards. Many cards sit on gently curved walls that form corridors and, seen from above, resolve into a wordmark. Build the whole piece toward one **signature shot**. The camera is a film camera: one named move per shot (dolly, crane, orbit, push-in, rack focus), eased in and out, and it never passes through geometry. Use a key, fill and rim light with soft shadows, an environment map for reflections, fog for depth, physically based materials with varied roughness and ACES tone mapping, so nothing looks like a default material. Elements react to each other, driven by springs or simple physics: a wave of accent light runs along a wall and each card tilts as it passes, and a card unhinges, swings with weight and settles. Depth of field only on the shots that need it. Seed every random number and compute each frame from time, so the render matches the preview.
 - Avoid: default materials and lighting, floating text labels, glows everywhere, a slowly spinning object as the whole idea, tech-demo looks. For the shorts it suits a hook or a payoff visual (a full-frame run), rendered at 9:16 inside the house's near-white world; the house rules in `brief.md` win on format, type and levels.
-- Full prompt: private, in `motion-prompts.md` (not in this repo).
+- Full prompt: `motion-prompts.md`.
 
 ### showreel-everything-transforms
 - Link: prompt-motion.com (entry link and creator still to add)
@@ -60,7 +60,7 @@ Sources to browse (by hand, as a viewer):
 - Tags: kinetic-type, shapes, charts, product-ui
 - Borrow: name the concept in one line first (for example "ink becomes type becomes architecture"). Then make every shot out of the previous one: shapes, type and colour transform into the next scene, with no cuts or fades. Show range in equal shares: kinetic type, shape morphing, a 2D-to-3D moment, a data/UI moment and an end title. Keep one typeface, at most three colours plus black and white, and one consistent camera language. Something changes on every beat (120 BPM), the strongest moment lands in the last full bar, and the final frame matches the first so the piece loops.
 - Avoid: particle bursts, glows, lens flares, camera shake, RGB split, crossfades, generic gradients, bouncy easing, holds over half a second, template looks. In a short, use its transform-don't-cut idea between graphic beats *inside* a run. Picture cuts between layouts stay hard cuts, and the house rules in `brief.md` win.
-- Full prompt: private, in `motion-prompts.md` (not in this repo).
+- Full prompt: `motion-prompts.md`.
 
 ### launch-film-one-take-glass
 - Link: prompt-motion.com (entry link and creator still to add)
@@ -82,7 +82,7 @@ Sources to browse (by hand, as a viewer):
   - footage goes in all-intra (`-g 1`), loaded as a blob URL;
   - scan the render for single-frame pops (frame-difference spikes about 3× their neighbours).
 - Avoid: crossfades, blur-ins, "developing" brightness, 3D flips, particles, glows, holds over 1 s, template looks. Its sound rule (downloaded SFX) conflicts with the house rule (everything synthesized in code), so the house wins. In a short, use its flood/iris/morphing-shape transitions *inside* a graphic run (for example an order/status sequence as one morphing shape); layout changes stay hard cuts; format is 9:16 and the house rules in `brief.md` win.
-- Full prompt: private, in `motion-prompts.md` (not in this repo).
+- Full prompt: `motion-prompts.md`.
 
 ### product-sting-frame-exact
 - Link: prompt-motion.com (entry link and creator still to add)
@@ -105,4 +105,4 @@ Sources to browse (by hand, as a viewer):
   - a white element on a white page needs a 1 px edge and a faint shadow;
   - heavy blur can erase a shape: lower it until the shape still reads.
 - Avoid: crossfades, frozen frames, stock UI kits, glows on UI text, unseeded randomness, template looks. Its palette (white, blues, navy; no purple or orange) and square 1080 format are specific to that brand. In a short, borrow its cursor behaviour, frosted-glass prompt box and cut/blur discipline inside graphic runs. The house rules in `brief.md` win on format, palette, type and sound.
-- Full prompt: private, in `motion-prompts.md` (not in this repo).
+- Full prompt: `motion-prompts.md`.
